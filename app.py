@@ -165,7 +165,7 @@ def run_ontological_analysis(resume_file, jd_file, ontology):
 
 # --- SIDEBAR UI ---
 with st.sidebar:
-    st.title("PSA™ Optimizer")
+    st.title("PSA™ Resume Optimizer")
     st.markdown("---")
     st.header("🔐 Access Control")
     license_key = st.text_input("Enter your PSA™ License Key", type="password", key="license_input_sidebar")
