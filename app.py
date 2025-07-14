@@ -119,39 +119,56 @@ def generate_hyperprompt(results: Dict) -> str:
 def generate_pdf_report(results: dict) -> bytes:
     pdf = FPDF()
     pdf.add_page()
-
-    # Add Inter font (regular and bold)
+    pdf.set_auto_page_break(auto=True, margin=15)
+    
+    use_unicode_font = False
+    # Try to add a custom Unicode font (e.g., Inter)
     try:
+        # Ensure you have these .ttf files in your project directory
         pdf.add_font('Inter', '', 'Inter-Regular.ttf', uni=True)
         pdf.add_font('Inter', 'B', 'Inter-Bold.ttf', uni=True)
-        pdf.set_font('Inter', 'B', size=14)
-        pdf.cell(0, 10, "PSA™ Resume Gap Analysis Report", ln=True)
+        use_unicode_font = True
     except RuntimeError:
-        # If Inter font files are missing, fall back to Arial and remove ™
-        pdf.set_font("Arial", size=12)
-        pdf.cell(0, 10, "PSA Resume Gap Analysis Report", ln=True)
-        st.warning("Inter font not found. PDF report will not include special characters.")
+        st.warning("⚠️ Inter font not found. PDF report will use a standard font and may not display all characters correctly.")
 
-    pdf.set_auto_page_break(auto=True, margin=15)
+    # --- Generate PDF Content ---
+    
+    # Set title font and write title
+    if use_unicode_font:
+        pdf.set_font('Inter', 'B', size=16)
+        pdf.cell(0, 10, "PSA™ Resume Gap Analysis Report", ln=True)
+    else:
+        pdf.set_font("Arial", 'B', size=16)
+        pdf.cell(0, 10, "PSA Resume Gap Analysis Report", ln=True)
+
+    pdf.ln(5) # Add a little space after the title
+
+    # Loop through the domain gaps and add them to the report
     domain_gaps = results.get("domain_gaps", {})
     for domain, gaps in domain_gaps.items():
-        try:
+        # Set domain header font
+        if use_unicode_font:
             pdf.set_font('Inter', 'B', size=12)
-            pdf.cell(0, 10, f"\n{domain}", ln=True)
-            pdf.set_font('Inter', '', size=12)
-        except:
+        else:
             pdf.set_font('Arial', 'B', size=12)
-            pdf.cell(0, 10, f"\n{domain}", ln=True)
-            pdf.set_font('Arial', size=12)
-
+        
+        pdf.cell(0, 10, f"{domain}", ln=True)
+        
+        # Set keyword list font
+        if use_unicode_font:
+            pdf.set_font('Inter', '', size=11)
+        else:
+            pdf.set_font('Arial', '', size=11)
+            
         for kw in gaps:
-            try:
-                pdf.cell(0, 10, f" - {kw}", ln=True)
-            except:
-                kw_cleaned = kw.encode('latin-1', 'replace').decode('latin-1')
-                pdf.cell(0, 10, f" - {kw_cleaned}", ln=True)
+            # For Arial, we must clean the text to prevent errors
+            if not use_unicode_font:
+                kw = kw.encode('latin-1', 'replace').decode('latin-1')
+            pdf.cell(0, 8, f"    • {kw}", ln=True)
+        pdf.ln(4) # Add space between domains
 
-    return pdf.output(dest='S')
+    # FIX: Return the PDF as a bytes object, which is what st.download_button needs.
+    return pdf.output()
 
 def save_analysis_to_history(results: Dict):
     """Save current analysis to session history for progress tracking."""
