@@ -332,25 +332,33 @@ def run_ontological_analysis(resume_file, jd_file, ontology: Dict, soc_override:
             soc_scores[group_name] = 100.0 if group_name == soc_override else 0.0
     if not best_soc_group:  # proceed with automatic detection only if no override
         for group_name, group_data in soc_groups.items():
-            # Get all keywords for this job category
             group_keywords = set()
+            triggered_domains = 0
+            triggered_domain_names = []
             for domain in group_data.get("signal_domains", []):
                 if domain in domain_keyword_map:
                     group_keywords.update(domain_keyword_map[domain])
-            
-            # Find relevant keywords in job description
+                    if domain_keyword_map[domain].intersection(jd_words):
+                        triggered_domains += 1
+                        triggered_domain_names.append(domain)
+
             relevant_jd_keywords = jd_words.intersection(group_keywords)
-            
-            # Score resume alignment with weighted scoring
+
             if relevant_jd_keywords:
                 matched_keywords = resume_words.intersection(relevant_jd_keywords)
-                # Weight multi-word phrases higher
                 weighted_score = sum(2 if ' ' in kw else 1 for kw in matched_keywords)
                 total_weight = sum(2 if ' ' in kw else 1 for kw in relevant_jd_keywords)
                 score = (weighted_score / total_weight) * 100 if total_weight > 0 else 0
             else:
                 score = 0
-            
+
+            # Only accept SOC groups with 3+ domains that have >0% match (i.e., present in JD)
+            if triggered_domains < 3:
+                score = 0
+            # Deprioritize any match where fewer than 2 signal domains were triggered
+            elif triggered_domains < 2:
+                score *= 0.6  # reduce confidence by 40%
+
             soc_scores[group_name] = score
             if score > max_soc_score:
                 max_soc_score, best_soc_group = score, group_name
@@ -858,31 +866,17 @@ else:
         
         if domain_gaps:
             st.markdown("### 🎯 Priority Keywords to Incorporate")
-            
+
             # Get top keywords from critical domains
             priority_keywords = []
             for domain in critical_domains:
                 if domain in domain_gaps:
                     priority_keywords.extend(domain_gaps[domain][:5])
-            
+
             if priority_keywords:
                 st.write("Focus on these high-impact terms:")
-                
-                # Display as chips
-                keyword_html = '<div style="display: flex; flex-wrap: wrap; gap: 8px;">'
-                for keyword in priority_keywords[:15]:
-                    keyword_html += f'''
-                    <span style="
-                        background-color: #3498db; 
-                        color: white; 
-                        padding: 6px 14px; 
-                        border-radius: 20px; 
-                        font-size: 14px;
-                        font-weight: 500;
-                    ">{keyword}</span>
-                    '''
-                keyword_html += "</div>"
-                st.markdown(keyword_html, unsafe_allow_html=True)
+                # Streamlit-safe rendering (no raw HTML)
+                st.write('\n'.join([f"- {kw}" for kw in priority_keywords[:15]]))
 
     with tabs[4]:  # Advanced Insights
         st.header("📈 Advanced Analytics & Insights")
