@@ -45,6 +45,15 @@ def check_license_status(license_key: str) -> Optional[str]:
 def calculate_trust_visibility_scores(results: Dict) -> Tuple[float, float]:
     """
     Calculate trust and visibility scores based on domain alignment.
+
+    Trust Score: Average score of critical domains (0-100)
+    Visibility Score: Hit rate for domains with gaps (0-100)
+
+    Args:
+        results: Analysis results dictionary
+        
+    Returns:
+        tuple: (trust_score, visibility_score) both rounded to 1 decimal
     """
     domain_scores = results.get("domain_scores", {})
     critical_domains = set(results.get("critical_domains", []))
@@ -67,6 +76,12 @@ def calculate_trust_visibility_scores(results: Dict) -> Tuple[float, float]:
 def generate_hyperprompt(results: Dict) -> str:
     """
     Generate an AI optimization prompt based on analysis results.
+
+    Args:
+        results: Analysis results dictionary
+        
+    Returns:
+        str: Formatted prompt for AI resume optimization
     """
     soc_group = results.get("predicted_soc_group", "your target role")
     critical_domains = results.get("critical_domains", [])
@@ -100,6 +115,181 @@ st.markdown("""
         padding-left: 5rem;
         padding-right: 5rem;
     }
+    h1, h2, h3 {
+        color: #2c3e50;
+    }
+    .stButton>button {
+        border-radius: 8px;
+        border: 1px solid #2c3e50;
+        color: #2c3e50;
+        background-color: #ffffff;
+        transition: all 0.2s ease-in-out;
+    }
+    .stButton>button:hover {
+        border-color: #3498db;
+        color: #ffffff;
+        background-color: #3498db;
+    }
+    .stButton>button:focus {
+        box-shadow: 0 0 0 2px #3498db40;
+    }
+    .stFileUploader {
+        border: 2px dashed #bdc3c7;
+        border-radius: 8px;
+        padding: 20px;
+        background-color: #fafafa;
+    }
+    .metric-card {
+        background-color: #f8f9fa;
+        border-radius: 8px;
+        padding: 15px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+</style>
+""", unsafe_allow_html=True)
+
+@st.cache_data(ttl=CACHE_TTL, show_spinner="Loading keyword ontology...")
+def load_ontology(ontology_path: str = "ontology.json") -> Optional[Dict]:
+    """
+    Load and cache the keyword ontology from JSON file.
+
+    Args:
+        ontology_path: Path to the ontology JSON file
+        
+    Returns:
+        Dict or None: Ontology data or None if loading fails
+    """
+    if not os.path.exists(ontology_path):
+        st.error(f"⚠️ Ontology file not found at '{ontology_path}'. Please ensure the file exists.")
+        return None
+
+    try:
+        with open(ontology_path, 'r', encoding='utf-8') as f:
+            ontology = json.load(f)
+            
+        # Validate ontology structure
+        required_keys = ["SignalDomains", "SOC_Groups"]
+        if not all(key in ontology for key in required_keys):
+            st.error(f"⚠️ Invalid ontology structure. Missing required keys: {required_keys}")
+            return None
+            
+        return ontology
+    except json.JSONDecodeError as e:
+        st.error(f"⚠️ Invalid JSON in ontology file: {e}")
+        return None
+    except Exception as e:
+        st.error(f"⚠️ Error loading ontology: {e}")
+        return None
+
+def validate_file(file) -> bool:
+    """
+    Validate uploaded file size and type.
+
+    Args:
+        file: Streamlit UploadedFile object
+        
+    Returns:
+        bool: True if valid, False otherwise
+    """
+    if file is None:
+        return False
+        
+    # Check file size
+    if file.size > MAX_FILE_SIZE_MB * 1024 * 1024:
+        st.error(f"⚠️ File '{file.name}' is too large. Maximum size: {MAX_FILE_SIZE_MB}MB")
+        return False
+        
+    # Check file type
+    valid_types = ["application/pdf", "text/plain"]
+    if file.type not in valid_types:
+        st.error(f"⚠️ Invalid file type. Please upload PDF or TXT files only.")
+        return False
+        
+    return True
+
+def extract_text_from_file(file) -> str:
+    """
+    Extract text content from uploaded file (PDF or TXT).
+
+    Args:
+        file: Streamlit UploadedFile object
+        
+    Returns:
+        str: Extracted text content
+    """
+    if not validate_file(file):
+        return ""
+        
+    try:
+        file_stream = io.BytesIO(file.getvalue())
+        
+        if file.type == "application/pdf":
+            reader = PdfReader(file_stream)
+            text_parts = []
+            
+            for i, page in enumerate(reader.pages):
+                try:
+                    page_text = page.extract_text()
+                    if page_text:
+                        text_parts.append(page_text)
+                except Exception as e:
+                    st.warning(f"⚠️ Could not extract text from page {i+1}: {e}")
+                    
+            return "\n".join(text_parts)
+        else:
+            # Handle text files with various encodings
+            encodings = ['utf-8', 'latin-1', 'cp1252']
+            for encoding in encodings:
+                try:
+                    file_stream.seek(0)
+                    return file_stream.read().decode(encoding)
+                except UnicodeDecodeError:
+                    continue
+            
+            st.warning("⚠️ Could not decode text file. Using fallback encoding.")
+            return file_stream.read().decode('utf-8', errors='ignore')
+            
+    except Exception as e:
+        st.error(f"⚠️ Failed to extract text from {file.name}: {e}")
+        return ""
+
+def clean_and_extract_words(text: str, preserve_phrases: bool = True) -> Set[str]:
+    """
+    Extract and clean words from text, optionally preserving multi-word phrases.
+
+    Args:
+        text: Raw text to process
+        preserve_phrases: Whether to extract 2-3 word phrases
+        
+    Returns:
+        Set[str]: Cleaned unique words/phrases
+    """
+    if not text:
+        return set()
+
+    # Normalize text
+    text = re.sub(r'([a-z])([A-Z])', r'\1 \2', text)  # Split camelCase
+    text = re.sub(r'https?://\S+|\S+@\S+', '', text)  # Remove URLs and emails
+
+    # Preserve hyphenated words and acronyms
+    text = re.sub(r'(?<![A-Z])[^\w\s\-]|(?<=[A-Z])[^\w\s\-]', ' ', text)
+
+    # Convert to lowercase for matching
+    text_lower = text.lower()
+
+    # Extract individual words
+    words = {word for word in text_lower.split() 
+            if len(word) > MIN_WORD_LENGTH and not word.isdigit()}
+
+    # Extract 2-word phrases if requested
+    if preserve_phrases:
+        tokens = text_lower.split()
+        for i in range(len(tokens) - 1):
+            phrase = f"{tokens[i]} {tokens[i+1]}"
+            if len(tokens[i]) > MIN_WORD_LENGTH and len(tokens[i+1]) > MIN_WORD_LENGTH:
+                words.add(phrase)
+
+    return words
 
 def enhance_ontology_for_real_world(ontology: Dict) -> Dict:
     """
@@ -116,45 +306,38 @@ def enhance_ontology_for_real_world(ontology: Dict) -> Dict:
             "scrum master", "product owner", "team lead", "director", "manager", "supervisor",
             "coordination", "planning", "oversight", "execution", "delivery", "milestone"
         ],
-        
         "Systems & Structure": [
             "agile", "scrum", "waterfall", "kanban", "methodology", "framework", "process",
             "workflow", "project lifecycle", "SDLC", "requirements", "specifications", 
             "deliverables", "timeline", "budget", "resources", "scope", "quality assurance",
             "testing", "deployment", "implementation", "integration", "configuration"
         ],
-        
         "AI & Technical Literacy": [
             "technology", "software", "applications", "systems", "digital", "technical",
             "IT", "information technology", "development", "engineering", "programming",
             "database", "cloud", "security", "networking", "hardware", "software development",
             "technical requirements", "technical specifications", "technical documentation"
         ],
-        
         "Communication Strategy": [
             "communication", "collaboration", "documentation", "reporting", "presentation",
             "meeting", "stakeholder", "client", "customer", "vendor", "partner", "team",
             "cross-functional", "interdisciplinary", "coordination", "facilitation"
         ],
-        
         "Data & Evidence": [
             "analysis", "reporting", "metrics", "KPIs", "dashboard", "tracking", "monitoring",
             "performance", "measurement", "assessment", "evaluation", "review", "audit",
             "quality", "testing", "validation", "verification", "documentation"
         ],
-        
         "Outcomes & Impact": [
             "results", "outcomes", "achievements", "success", "performance", "improvement",
             "optimization", "efficiency", "productivity", "cost reduction", "revenue",
             "profit", "savings", "ROI", "value", "benefit", "impact", "goals", "objectives"
         ],
-        
         "Risk & Compliance": [
             "risk management", "compliance", "regulations", "standards", "policies",
             "procedures", "governance", "controls", "security", "safety", "audit",
             "quality", "legal", "regulatory", "certification", "approval"
         ],
-        
         "Adaptation & Flexibility": [
             "change", "flexibility", "adaptability", "scalability", "growth", "evolution",
             "improvement", "innovation", "problem solving", "troubleshooting", "debugging",
@@ -304,457 +487,6 @@ def run_enhanced_ontological_analysis(resume_file, jd_file, ontology: Dict, soc_
                 domain_gaps[domain_name] = sorted_gaps[:20]  # Top 20 gaps
 
     # Calculate overall score
-    if all_jd_keywords:
-        overall_matched = all_jd_keywords.intersection(resume_words)
-        overall_score = (len(overall_matched) / len(all_jd_keywords)) * 100
-    else:
-        overall_score = 0
-
-    # Get suggested titles and critical domains
-    suggested_titles = soc_groups.get(best_soc_group, {}).get("example_titles", [])
-    critical_domains = soc_groups.get(best_soc_group, {}).get("signal_domains", [])
-
-    return {
-        "predicted_soc_group": best_soc_group,
-        "soc_scores": soc_scores,
-        "critical_domains": critical_domains,
-        "domain_scores": domain_scores,
-        "domain_gaps": domain_gaps,
-        "overall_score": round(overall_score, 1),
-        "total_jd_keywords": len(all_jd_keywords),
-        "matched_keywords": len(all_jd_keywords.intersection(resume_words)),
-        "resume_text": resume_text[:500] + "..." if len(resume_text) > 500 else resume_text,
-        "jd_text": jd_text[:500] + "..." if len(jd_text) > 500 else jd_text,
-        "suggested_titles": suggested_titles
-    }
-
-@st.cache_data(show_spinner="Analyzing documents...")
-def debug_ontological_analysis(resume_file, jd_file, ontology: Dict, soc_override: Optional[str] = None) -> Optional[Dict]:
-    """
-    DEBUG VERSION: Shows what keywords are being extracted and matched
-    """
-    # Extract text from files
-    resume_text = extract_text_from_file(resume_file)
-    jd_text = extract_text_from_file(jd_file)
-
-    if not resume_text:
-        st.error("⚠️ Could not extract text from resume")
-        return None
-    if not jd_text:
-        st.error("⚠️ Could not extract text from job description")
-        return None
-
-    # Extract words and phrases
-    resume_words = clean_and_extract_words(resume_text)
-    jd_words = clean_and_extract_words(jd_text)
-
-    # DEBUG: Show extracted keywords
-    st.write("### 🔍 DEBUG: Extracted Keywords")
-    
-    with st.expander("Resume Keywords (first 50)", expanded=False):
-        resume_list = sorted(list(resume_words))[:50]
-        st.write(", ".join(resume_list))
-    
-    with st.expander("Job Description Keywords (first 50)", expanded=False):
-        jd_list = sorted(list(jd_words))[:50]
-        st.write(", ".join(jd_list))
-    
-    # DEBUG: Show direct overlap
-    direct_overlap = resume_words.intersection(jd_words)
-    st.write(f"**Direct keyword overlap:** {len(direct_overlap)} keywords")
-    if direct_overlap:
-        with st.expander("Direct Overlapping Keywords", expanded=True):
-            st.write(", ".join(sorted(direct_overlap)))
-
-    if not resume_words:
-        st.error("⚠️ No valid content found in resume")
-        return None
-    if not jd_words:
-        st.error("⚠️ No valid content found in job description")
-        return None
-
-    signal_domains = ontology.get("SignalDomains", {})
-    soc_groups = ontology.get("SOC_Groups", {})
-
-    # DEBUG: Show ontology keywords for a few domains
-    st.write("### 🔍 DEBUG: Ontology Keywords")
-    sample_domains = ["Leadership & Influence", "Systems & Structure", "AI & Technical Literacy"]
-    
-    for domain in sample_domains:
-        if domain in signal_domains:
-            with st.expander(f"Ontology: {domain}", expanded=False):
-                st.write(", ".join(signal_domains[domain]))
-
-    # Pre-compute domain keywords for efficiency
-    domain_keyword_map = {}
-    for domain_name, keywords in signal_domains.items():
-        domain_keywords = set()
-        for phrase in keywords:
-            # Add both the full phrase and individual words
-            phrase_lower = phrase.lower()
-            domain_keywords.add(phrase_lower)
-            domain_keywords.update(phrase_lower.split())
-        domain_keyword_map[domain_name] = domain_keywords
-
-    # DEBUG: Show processed domain keywords
-    st.write("### 🔍 DEBUG: Processed Domain Keywords")
-    for domain in sample_domains:
-        if domain in domain_keyword_map:
-            with st.expander(f"Processed: {domain}", expanded=False):
-                keywords = sorted(list(domain_keyword_map[domain]))[:20]
-                st.write(", ".join(keywords))
-
-    # Calculate domain scores and gaps with DEBUG info
-    domain_scores, domain_gaps = {}, {}
-    all_jd_keywords = set()
-    
-    st.write("### 🔍 DEBUG: Domain Matching")
-    
-    for domain_name, domain_keywords in domain_keyword_map.items():
-        # Find domain keywords in job description
-        domain_jd_keywords = domain_keywords.intersection(jd_words)
-        
-        if domain_jd_keywords:
-            all_jd_keywords.update(domain_jd_keywords)
-            
-            # Calculate match score
-            matched_keywords = domain_jd_keywords.intersection(resume_words)
-            score = (len(matched_keywords) / len(domain_jd_keywords)) * 100
-            domain_scores[domain_name] = round(score, 1)
-            
-            # DEBUG: Show matching details for important domains
-            if domain_name in ["Leadership & Influence", "Systems & Structure", "AI & Technical Literacy"]:
-                with st.expander(f"DEBUG: {domain_name} Matching", expanded=False):
-                    st.write(f"**JD Keywords found:** {len(domain_jd_keywords)}")
-                    st.write(f"**Resume matches:** {len(matched_keywords)}")
-                    st.write(f"**Score:** {score:.1f}%")
-                    if len(domain_jd_keywords) <= 20:
-                        st.write(f"**JD Keywords:** {', '.join(sorted(domain_jd_keywords))}")
-                    if matched_keywords:
-                        st.write(f"**Matched:** {', '.join(sorted(matched_keywords))}")
-            
-            # Find gaps
-            gaps = domain_jd_keywords - resume_words
-            if gaps:
-                gap_list = sorted(list(gaps))
-                domain_gaps[domain_name] = gap_list[:20]
-
-    # Calculate overall score
-    if all_jd_keywords:
-        overall_matched = all_jd_keywords.intersection(resume_words)
-        overall_score = (len(overall_matched) / len(all_jd_keywords)) * 100
-        
-        # DEBUG: Overall scoring
-        st.write("### 🔍 DEBUG: Overall Scoring")
-        st.write(f"**Total JD keywords from ontology:** {len(all_jd_keywords)}")
-        st.write(f"**Matched keywords:** {len(overall_matched)}")
-        st.write(f"**Overall score:** {overall_score:.1f}%")
-        
-        with st.expander("All Matched Keywords", expanded=True):
-            if overall_matched:
-                st.write(", ".join(sorted(overall_matched)))
-            else:
-                st.write("No matches found!")
-    else:
-        overall_score = 0
-        st.write("### 🔍 DEBUG: No JD keywords found in ontology!")
-
-    # Simple SOC prediction for debugging
-    best_soc_group = "Management Occupations"  # Default for testing
-    soc_scores = {"Management Occupations": 75.0}
-    critical_domains = ["Leadership & Influence", "Systems & Structure", "Outcomes & Impact"]
-    suggested_titles = ["IT Project Manager", "Operations Manager", "Program Manager"]
-
-    return {
-        "predicted_soc_group": best_soc_group,
-        "soc_scores": soc_scores,
-        "critical_domains": critical_domains,
-        "domain_scores": domain_scores,
-        "domain_gaps": domain_gaps,
-        "overall_score": round(overall_score, 1),
-        "total_jd_keywords": len(all_jd_keywords),
-        "matched_keywords": len(all_jd_keywords.intersection(resume_words)),
-        "resume_text": resume_text[:500] + "..." if len(resume_text) > 500 else resume_text,
-        "jd_text": jd_text[:500] + "..." if len(jd_text) > 500 else jd_text,
-        "suggested_titles": suggested_titles,
-        # DEBUG INFO
-        "debug_resume_words": len(resume_words),
-        "debug_jd_words": len(jd_words),
-        "debug_direct_overlap": len(direct_overlap)
-    }
-    h1, h2, h3 {
-        color: #2c3e50;
-    }
-    .stButton>button {
-        border-radius: 8px;
-        border: 1px solid #2c3e50;
-        color: #2c3e50;
-        background-color: #ffffff;
-        transition: all 0.2s ease-in-out;
-    }
-    .stButton>button:hover {
-        border-color: #3498db;
-        color: #ffffff;
-        background-color: #3498db;
-    }
-    .stButton>button:focus {
-        box-shadow: 0 0 0 2px #3498db40;
-    }
-    .stFileUploader {
-        border: 2px dashed #bdc3c7;
-        border-radius: 8px;
-        padding: 20px;
-        background-color: #fafafa;
-    }
-    .metric-card {
-        background-color: #f8f9fa;
-        border-radius: 8px;
-        padding: 15px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
-</style>
-""", unsafe_allow_html=True)
-
-@st.cache_data(ttl=CACHE_TTL, show_spinner="Loading keyword ontology...")
-def load_ontology(ontology_path: str = "ontology.json") -> Optional[Dict]:
-    """
-    Load and cache the keyword ontology from JSON file.
-    """
-    if not os.path.exists(ontology_path):
-        st.error(f"⚠️ Ontology file not found at '{ontology_path}'. Please ensure the file exists.")
-        return None
-
-    try:
-        with open(ontology_path, 'r', encoding='utf-8') as f:
-            ontology = json.load(f)
-            
-        # Validate ontology structure
-        required_keys = ["SignalDomains", "SOC_Groups"]
-        if not all(key in ontology for key in required_keys):
-            st.error(f"⚠️ Invalid ontology structure. Missing required keys: {required_keys}")
-            return None
-            
-        return ontology
-    except json.JSONDecodeError as e:
-        st.error(f"⚠️ Invalid JSON in ontology file: {e}")
-        return None
-    except Exception as e:
-        st.error(f"⚠️ Error loading ontology: {e}")
-        return None
-
-def validate_file(file) -> bool:
-    """
-    Validate uploaded file size and type.
-    """
-    if file is None:
-        return False
-        
-    # Check file size
-    if file.size > MAX_FILE_SIZE_MB * 1024 * 1024:
-        st.error(f"⚠️ File '{file.name}' is too large. Maximum size: {MAX_FILE_SIZE_MB}MB")
-        return False
-        
-    # Check file type
-    valid_types = ["application/pdf", "text/plain"]
-    if file.type not in valid_types:
-        st.error(f"⚠️ Invalid file type. Please upload PDF or TXT files only.")
-        return False
-        
-    return True
-
-def extract_text_from_file(file) -> str:
-    """
-    Extract text content from uploaded file (PDF or TXT).
-    """
-    if not validate_file(file):
-        return ""
-        
-    try:
-        file_stream = io.BytesIO(file.getvalue())
-        
-        if file.type == "application/pdf":
-            reader = PdfReader(file_stream)
-            text_parts = []
-            
-            for i, page in enumerate(reader.pages):
-                try:
-                    page_text = page.extract_text()
-                    if page_text:
-                        text_parts.append(page_text)
-                except Exception as e:
-                    st.warning(f"⚠️ Could not extract text from page {i+1}: {e}")
-                    
-            return "\n".join(text_parts)
-        else:
-            # Handle text files with various encodings
-            encodings = ['utf-8', 'latin-1', 'cp1252']
-            for encoding in encodings:
-                try:
-                    file_stream.seek(0)
-                    return file_stream.read().decode(encoding)
-                except UnicodeDecodeError:
-                    continue
-            
-            st.warning("⚠️ Could not decode text file. Using fallback encoding.")
-            return file_stream.read().decode('utf-8', errors='ignore')
-            
-    except Exception as e:
-        st.error(f"⚠️ Failed to extract text from {file.name}: {e}")
-        return ""
-
-def clean_and_extract_words(text: str, preserve_phrases: bool = True) -> Set[str]:
-    """
-    Extract and clean words from text, optionally preserving multi-word phrases.
-    """
-    if not text:
-        return set()
-
-    # Normalize text
-    text = re.sub(r'([a-z])([A-Z])', r'\1 \2', text)  # Split camelCase
-    text = re.sub(r'https?://\S+|\S+@\S+', '', text)  # Remove URLs and emails
-
-    # Preserve hyphenated words and acronyms
-    text = re.sub(r'(?<![A-Z])[^\w\s\-]|(?<=[A-Z])[^\w\s\-]', ' ', text)
-
-    # Convert to lowercase for matching
-    text_lower = text.lower()
-
-    # Extract individual words
-    words = {word for word in text_lower.split() 
-            if len(word) > MIN_WORD_LENGTH and not word.isdigit()}
-
-    # Extract 2-word phrases if requested
-    if preserve_phrases:
-        tokens = text_lower.split()
-        for i in range(len(tokens) - 1):
-            phrase = f"{tokens[i]} {tokens[i+1]}"
-            if len(tokens[i]) > MIN_WORD_LENGTH and len(tokens[i+1]) > MIN_WORD_LENGTH:
-                words.add(phrase)
-
-    return words
-
-@st.cache_data(show_spinner="Analyzing documents...")
-def run_ontological_analysis(resume_file, jd_file, ontology: Dict, soc_override: Optional[str] = None) -> Optional[Dict]:
-    """
-    Perform comprehensive ontological analysis of resume against job description.
-    """
-    # Extract text from files
-    resume_text = extract_text_from_file(resume_file)
-    jd_text = extract_text_from_file(jd_file)
-
-    if not resume_text:
-        st.error("⚠️ Could not extract text from resume")
-        return None
-    if not jd_text:
-        st.error("⚠️ Could not extract text from job description")
-        return None
-
-    # Extract words and phrases
-    resume_words = clean_and_extract_words(resume_text)
-    jd_words = clean_and_extract_words(jd_text)
-
-    if not resume_words:
-        st.error("⚠️ No valid content found in resume")
-        return None
-    if not jd_words:
-        st.error("⚠️ No valid content found in job description")
-        return None
-
-    signal_domains = ontology.get("SignalDomains", {})
-    soc_groups = ontology.get("SOC_Groups", {})
-
-    # Pre-compute domain keywords for efficiency
-    domain_keyword_map = {}
-    for domain_name, keywords in signal_domains.items():
-        domain_keywords = set()
-        for phrase in keywords:
-            # Add both the full phrase and individual words
-            phrase_lower = phrase.lower()
-            domain_keywords.add(phrase_lower)
-            domain_keywords.update(phrase_lower.split())
-        domain_keyword_map[domain_name] = domain_keywords
-
-    # IMPROVED SOC GROUP PREDICTION
-    best_soc_group, max_soc_score = None, -1
-    soc_scores = {}
-    
-    # Respect manual override if provided
-    if soc_override and soc_override != "Auto Detect" and soc_override in soc_groups:
-        best_soc_group = soc_override
-        max_soc_score = 100.0
-        # Fill soc_scores
-        for group_name in soc_groups:
-            soc_scores[group_name] = 100.0 if group_name == soc_override else 0.0
-    else:
-        # Automatic detection with improved logic
-        for group_name, group_data in soc_groups.items():
-            group_keywords = set()
-            triggered_domains = 0
-            domain_scores = []
-            
-            for domain in group_data.get("signal_domains", []):
-                if domain in domain_keyword_map:
-                    domain_keywords = domain_keyword_map[domain]
-                    group_keywords.update(domain_keywords)
-                    
-                    # Check if this domain is present in JD
-                    domain_jd_keywords = domain_keywords.intersection(jd_words)
-                    if domain_jd_keywords:
-                        triggered_domains += 1
-                        # Calculate domain score
-                        matched_keywords = domain_jd_keywords.intersection(resume_words)
-                        domain_score = len(matched_keywords) / len(domain_jd_keywords) if domain_jd_keywords else 0
-                        domain_scores.append(domain_score)
-
-            # Calculate overall group score
-            if triggered_domains >= 2:  # Reduced threshold
-                # Weight by domain performance
-                avg_domain_score = sum(domain_scores) / len(domain_scores) if domain_scores else 0
-                
-                # Bonus for having more triggered domains
-                domain_bonus = min(triggered_domains / len(group_data.get("signal_domains", [])), 1.0)
-                
-                # Final score
-                score = (avg_domain_score * 0.7 + domain_bonus * 0.3) * 100
-                
-                # Boost for highly relevant groups
-                if any(keyword in jd_text.lower() for keyword in ['project manager', 'project management', 'agile', 'scrum']):
-                    if 'management' in group_name.lower():
-                        score *= 1.3
-                    elif 'computer' in group_name.lower():
-                        score *= 1.2
-                        
-            else:
-                score = 0
-                
-            soc_scores[group_name] = round(score, 1)
-            if score > max_soc_score:
-                max_soc_score, best_soc_group = score, group_name
-
-    # Calculate domain scores and gaps
-    domain_scores, domain_gaps = {}, {}
-    all_jd_keywords = set()
-
-    for domain_name, domain_keywords in domain_keyword_map.items():
-        # Find domain keywords in job description
-        domain_jd_keywords = domain_keywords.intersection(jd_words)
-        
-        if domain_jd_keywords:
-            all_jd_keywords.update(domain_jd_keywords)
-            
-            # Calculate match score
-            matched_keywords = domain_jd_keywords.intersection(resume_words)
-            score = (len(matched_keywords) / len(domain_jd_keywords)) * 100
-            domain_scores[domain_name] = round(score, 1)
-            
-            # Find gaps
-            gaps = domain_jd_keywords - resume_words
-            if gaps:
-                # Sort gaps by frequency in JD (approximated by position)
-                gap_list = sorted(list(gaps), key=lambda x: jd_text.lower().find(x))
-                domain_gaps[domain_name] = gap_list[:20]  # Limit to top 20 gaps
-
-    # Calculate overall score (IMPROVED)
     if all_jd_keywords:
         overall_matched = all_jd_keywords.intersection(resume_words)
         overall_score = (len(overall_matched) / len(all_jd_keywords)) * 100
