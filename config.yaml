@@ -1,3 +1,64 @@
-weights:
-  mli: 0.3
-  signal_strength: 0.7
+[
+  {
+    "op": "add",
+    "path": "/SignalDomains/Technical & Systemic Equity",
+    "value": [
+      "responsible ai",
+      "ai ethics",
+      "algorithmic fairness",
+      "bias detection",
+      "model governance",
+      "inclusive design",
+      "accessibility",
+      "data privacy",
+      "systemic equity",
+      "tech policy"
+    ]
+  },
+  {
+    "op": "add",
+    "path": "/SignalDomains/Corporate L&D & Andragogy",
+    "value": [
+      "andragogy",
+      "workplace learning",
+      "capability development",
+      "upskilling",
+      "reskilling",
+      "learning and development",
+      "corporate training",
+      "instructional design",
+      "competency mapping",
+      "adult learning theory"
+    ]
+  },
+  {
+    "op": "add",
+    "path": "/SOC_Groups/Technology, Ethics & Governance Occupations",
+    "value": {
+      "example_titles": [
+        "AI Ethicist",
+        "Responsible AI Strategist",
+        "Digital Policy Analyst",
+        "AI Governance Specialist",
+        "Technology Compliance Manager",
+        "UX Accessibility Lead"
+      ],
+      "signal_domains": [
+        "Technical & Systemic Equity",
+        "AI & Technical Literacy",
+        "Systems & Structure",
+        "Risk & Compliance",
+        "Leadership & Influence"
+      ]
+    }
+  },
+  {
+    "op": "replace",
+    "path": "/SOC_Groups/Life, Physical, and Social Science Occupations/signal_domains",
+    "value": [
+      "Data & Evidence",
+      "Collaboration & Relational Work",
+      "Equity & Inclusion"
+    ]
+  }
+]
