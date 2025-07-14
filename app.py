@@ -165,11 +165,16 @@ def generate_pdf_report(results: dict) -> bytes:
                 pdf.cell(0, 6, f"    ... and {len(gaps) - 10} more", ln=True)
             pdf.ln(3)
 
-        # FIXED: Return proper bytes
+        # FIXED: Handle bytearray return from FPDF
         pdf_output = pdf.output(dest='S')
+        
+        # Convert to bytes regardless of what FPDF returns
         if isinstance(pdf_output, str):
             return pdf_output.encode('latin-1')
-        return pdf_output
+        elif isinstance(pdf_output, bytearray):
+            return bytes(pdf_output)  # Convert bytearray to bytes
+        else:
+            return pdf_output  # Already bytes
             
     except Exception:
         # Fallback minimal PDF
@@ -181,7 +186,13 @@ def generate_pdf_report(results: dict) -> bytes:
         pdf.cell(0, 8, "Error generating detailed report. Please try again.", ln=True)
         
         pdf_output = pdf.output(dest='S')
-        return pdf_output.encode('latin-1') if isinstance(pdf_output, str) else pdf_output
+        # Convert to bytes regardless of what FPDF returns
+        if isinstance(pdf_output, str):
+            return pdf_output.encode('latin-1')
+        elif isinstance(pdf_output, bytearray):
+            return bytes(pdf_output)  # Convert bytearray to bytes
+        else:
+            return pdf_output  # Already bytes
 
 def save_analysis_to_history(results: Dict):
     """Save current analysis to session history for progress tracking."""
