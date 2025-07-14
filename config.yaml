@@ -1,3 +1,4 @@
 weights:
-  mli: 0.4
-  signal_strength: 0.6
+  mli: 0.3
+  signal_strength: 0.5
+  seniority_hint: 0.2
