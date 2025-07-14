@@ -1,10 +1,10 @@
 {
   "SignalDomains": {
     "Presence & Identity": [
-      "presence", "voice", "visibility", "identity", "stance", "authenticity", "reputation", "persona", "recognition", "name"
+      "presence", "voice", "visibility", "identity", "stance", "authenticity", "reputation", "persona", "recognition", "name", "performance narrative", "flattening", "visibility loop", "profile trust", "signal erosion"
     ],
     "Communication Strategy": [
-      "signal", "transmit", "encode", "resonance", "map", "message", "tone", "framing", "narrative", "audience"
+      "signal", "transmit", "encode", "resonance", "map", "message", "tone", "framing", "narrative", "audience", "algorithmic visibility", "narrative arc", "signal hygiene", "formica"
     ],
     "Learning & Instruction": [
       "curriculum", "teaching", "instructional design", "scaffold", "assessment", "learning outcomes", "pedagogy", "competency", "formative", "engagement"
@@ -35,7 +35,8 @@
     ],
     "AI & Technical Literacy": [
   "AI", "machine learning", "automation", "digital fluency", "tools", "algorithms", "prompting", "data modeling", "tech stack", "interface",
-  "usability testing", "ethnography", "research operations", "UX", "user research", "human-computer interaction"]
+  "usability testing", "ethnography", "research operations", "UX", "user research", "human-computer interaction"
+],
     },     
   "SOC_Groups": {
     "Management Occupations": {
@@ -54,6 +55,16 @@
     "Data & Evidence",
     "Communication Strategy",
     "Leadership & Influence"]
+    },
+    "AI, Data & UX Leadership Occupations": {
+      "example_titles": ["AI Product Director", "UX Research Director", "Data & AI Program Manager"],
+      "signal_domains": [
+        "AI & Technical Literacy",
+        "Leadership & Influence",
+        "Data & Evidence",
+        "Communication Strategy",
+        "Systems & Structure"
+      ]
     },
     "Architecture and Engineering Occupations": {
       "example_titles": ["Civil Engineers", "Architects", "Mechanical Engineers"],
@@ -93,7 +104,7 @@
     },
     "Building and Grounds Cleaning and Maintenance Occupations": {
       "example_titles": ["Janitors", "Landscapers", "Pest Control Workers"],
-      "signal_domains": ["Systems & Structure", "Adaptation & Flexibility"]
+      "signal_domains": ["Adaptation & Flexibility"]
     },
     "Personal Care and Service Occupations": {
       "example_titles": ["Childcare Workers", "Personal Care Aides", "Hairstylists"],
@@ -109,7 +120,7 @@
     },
     "Farming, Fishing, and Forestry Occupations": {
       "example_titles": ["Agricultural Workers", "Loggers", "Fishers"],
-      "signal_domains": ["Adaptation & Flexibility", "Systems & Structure"]
+      "signal_domains": ["Adaptation & Flexibility"]
     },
     "Construction and Extraction Occupations": {
       "example_titles": ["Electricians", "Plumbers", "Construction Laborers"],
