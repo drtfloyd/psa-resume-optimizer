@@ -22,7 +22,7 @@ from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.units import inch
 from reportlab.lib import colors
 import pandas as pd
-import plotly.express as px
+
 import plotly.graph_objects as go
 
 # --- CONFIGURATION ---
@@ -361,47 +361,6 @@ def create_domain_comparison_chart(current_results: Dict, history: List[Dict]) -
     return " ".join(prompt_parts)
 
 # --- Custom CSS for a Polished Look ---
-
-st.markdown("""
-<style>
-    .main .block-container {
-        padding-top: 2rem;
-        padding-bottom: 2rem;
-        padding-left: 5rem;
-        padding-right: 5rem;
-    }
-    h1, h2, h3 {
-        color: #2c3e50;
-    }
-    .stButton>button {
-        border-radius: 8px;
-        border: 1px solid #2c3e50;
-        color: #2c3e50;
-        background-color: #ffffff;
-        transition: all 0.2s ease-in-out;
-    }
-    .stButton>button:hover {
-        border-color: #3498db;
-        color: #ffffff;
-        background-color: #3498db;
-    }
-    .stButton>button:focus {
-        box-shadow: 0 0 0 2px #3498db40;
-    }
-    .stFileUploader {
-        border: 2px dashed #bdc3c7;
-        border-radius: 8px;
-        padding: 20px;
-        background-color: #fafafa;
-    }
-    .metric-card {
-        background-color: #f8f9fa;
-        border-radius: 8px;
-        padding: 15px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
-</style>
-""", unsafe_allow_html=True)
 
 @st.cache_data(ttl=CACHE_TTL, show_spinner="Loading keyword ontology...")
 def load_ontology(ontology_path: str = "ontology.json") -> Optional[Dict]:
