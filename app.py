@@ -119,19 +119,37 @@ def generate_hyperprompt(results: Dict) -> str:
 def generate_pdf_report(results: dict) -> bytes:
     pdf = FPDF()
     pdf.add_page()
-    pdf.set_font("Arial", size=12)
+
+    # Add Inter font (regular and bold)
+    try:
+        pdf.add_font('Inter', '', 'Inter-Regular.ttf', uni=True)
+        pdf.add_font('Inter', 'B', 'Inter-Bold.ttf', uni=True)
+        pdf.set_font('Inter', 'B', size=14)
+        pdf.cell(0, 10, "PSA™ Resume Gap Analysis Report", ln=True)
+    except RuntimeError:
+        # If Inter font files are missing, fall back to Arial and remove ™
+        pdf.set_font("Arial", size=12)
+        pdf.cell(0, 10, "PSA Resume Gap Analysis Report", ln=True)
+        st.warning("Inter font not found. PDF report will not include special characters.")
+
     pdf.set_auto_page_break(auto=True, margin=15)
-
-    pdf.set_font("Arial", 'B', size=14)
-    pdf.cell(0, 10, "PSA™ Resume Gap Analysis Report", ln=True)
-
     domain_gaps = results.get("domain_gaps", {})
     for domain, gaps in domain_gaps.items():
-        pdf.set_font("Arial", 'B', size=12)
-        pdf.cell(0, 10, f"\n{domain}", ln=True)
-        pdf.set_font("Arial", size=12)
+        try:
+            pdf.set_font('Inter', 'B', size=12)
+            pdf.cell(0, 10, f"\n{domain}", ln=True)
+            pdf.set_font('Inter', '', size=12)
+        except:
+            pdf.set_font('Arial', 'B', size=12)
+            pdf.cell(0, 10, f"\n{domain}", ln=True)
+            pdf.set_font('Arial', size=12)
+
         for kw in gaps:
-            pdf.cell(0, 10, f" - {kw}", ln=True)
+            try:
+                pdf.cell(0, 10, f" - {kw}", ln=True)
+            except:
+                kw_cleaned = kw.encode('latin-1', 'replace').decode('latin-1')
+                pdf.cell(0, 10, f" - {kw_cleaned}", ln=True)
 
     return pdf.output(dest='S').encode('latin-1')
 
