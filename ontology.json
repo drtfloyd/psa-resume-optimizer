@@ -45,10 +45,14 @@
     "Business and Financial Operations Occupations": {
       "example_titles": ["Accountants", "Financial Analysts", "HR Specialists"],
       "signal_domains": ["Data & Evidence", "Risk & Compliance", "Systems & Structure"]
-    },
     "Computer and Mathematical Occupations": {
-      "example_titles": ["Software Developers", "Data Scientists", "Statisticians"],
-      "signal_domains": ["AI & Technical Literacy", "Systems & Structure", "Data & Evidence"]
+  "example_titles": ["Software Developers", "Data Scientists", "Statisticians"],
+  "signal_domains": [
+    "AI & Technical Literacy",
+    "Systems & Structure",
+    "Data & Evidence",
+    "Communication Strategy",
+    "Leadership & Influence"]
     },
     "Architecture and Engineering Occupations": {
       "example_titles": ["Civil Engineers", "Architects", "Mechanical Engineers"],
