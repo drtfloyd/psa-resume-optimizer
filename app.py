@@ -600,6 +600,7 @@ def run_enhanced_ontological_analysis(resume_file, jd_file, ontology: Dict, soc_
     # Calculate domain scores and gaps with enhanced matching
     domain_scores, domain_gaps = {}, {}
     all_jd_keywords = set()
+    resume_text_lower = resume_text.lower()
 
     for domain_name, domain_keywords in domain_keyword_map.items():
         # Find domain keywords in job description
@@ -608,13 +609,19 @@ def run_enhanced_ontological_analysis(resume_file, jd_file, ontology: Dict, soc_
         if domain_jd_keywords:
             all_jd_keywords.update(domain_jd_keywords)
             
-            # Calculate match score
-            matched_keywords = domain_jd_keywords.intersection(resume_words)
+            # Calculate match score using substring matching
+            matched_keywords = set()
+            for keyword in domain_jd_keywords:
+                if keyword.lower() in resume_text_lower:
+                    matched_keywords.add(keyword)
             score = (len(matched_keywords) / len(domain_jd_keywords)) * 100
             domain_scores[domain_name] = round(score, 1)
             
-            # Find gaps (prioritize business terms)
-            gaps = domain_jd_keywords - resume_words
+            # Find gaps (prioritize business terms) using substring matching
+            gaps = set()
+            for keyword in domain_jd_keywords:
+                if keyword.lower() not in resume_text_lower:
+                    gaps.add(keyword)
             if gaps:
                 # Sort gaps by importance (business terms first)
                 business_priority = []
@@ -638,7 +645,10 @@ def run_enhanced_ontological_analysis(resume_file, jd_file, ontology: Dict, soc_
 
     # IMPROVED OVERALL SCORE CALCULATION
     if all_jd_keywords:
-        overall_matched = all_jd_keywords.intersection(resume_words)
+        overall_matched = set()
+        for keyword in all_jd_keywords:
+            if keyword.lower() in resume_text_lower:
+                overall_matched.add(keyword)
         base_score = (len(overall_matched) / len(all_jd_keywords)) * 100
         
         # Apply boost for business context
@@ -662,7 +672,7 @@ def run_enhanced_ontological_analysis(resume_file, jd_file, ontology: Dict, soc_
         "domain_gaps": domain_gaps,
         "overall_score": round(overall_score, 1),
         "total_jd_keywords": len(all_jd_keywords),
-        "matched_keywords": len(all_jd_keywords.intersection(resume_words)),
+        "matched_keywords": len([kw for kw in all_jd_keywords if kw.lower() in resume_text_lower]),
         "resume_text": resume_text[:500] + "..." if len(resume_text) > 500 else resume_text,
         "jd_text": jd_text[:500] + "..." if len(jd_text) > 500 else jd_text,
         "suggested_titles": suggested_titles
