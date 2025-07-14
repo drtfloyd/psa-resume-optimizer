@@ -16,30 +16,42 @@ MAX_FILE_SIZE_MB = 10
 MIN_WORD_LENGTH = 2
 CACHE_TTL = 3600  # 1 hour
 
+# --- ORIGINAL LICENSE VALIDATION ---
+
+def check_license_status(license_key: str) -> Optional[str]:
+    """
+    Securely check license status with proper error handling.
+
+    Args:
+        license_key: License key to validate
+        
+    Returns:
+        str or None: License tier or None if invalid
+    """
+    if not license_key:
+        return None
+        
+    try:
+        # Call the license validation function
+        tier = get_user_mode(license_key)
+        return tier if tier in ["pro", "enterprise"] else None
+    except Exception as e:
+        # Log error for debugging but don't expose details to user
+        st.error("⚠️ License validation failed. Please check your key and try again.")
+        return None
+
 # --- TRUST & VISIBILITY TUNER ---
 
 def calculate_trust_visibility_scores(results: Dict) -> Tuple[float, float]:
     """
     Calculate trust and visibility scores based on domain alignment.
-
-    Trust Score: Average score of critical domains (0-100)
-    Visibility Score: Hit rate for domains with gaps (0-100)
-
-    Args:
-        results: Analysis results dictionary
-        
-    Returns:
-        tuple: (trust_score, visibility_score) both rounded to 1 decimal
     """
     domain_scores = results.get("domain_scores", {})
     critical_domains = set(results.get("critical_domains", []))
     domain_gaps = results.get("domain_gaps", {})
 
-    # Calculate trust score (average of top 5 critical domain scores)
-    trust_scores = sorted(
-        [score for domain, score in domain_scores.items() if domain in critical_domains],
-        reverse=True
-    )[:5]
+    # Calculate trust score (average of critical domain scores)
+    trust_scores = [score for domain, score in domain_scores.items() if domain in critical_domains]
     trust_score = sum(trust_scores) / len(trust_scores) if trust_scores else 0
   
     # Calculate visibility score (domains with good coverage)
@@ -55,12 +67,6 @@ def calculate_trust_visibility_scores(results: Dict) -> Tuple[float, float]:
 def generate_hyperprompt(results: Dict) -> str:
     """
     Generate an AI optimization prompt based on analysis results.
-
-    Args:
-        results: Analysis results dictionary
-        
-    Returns:
-        str: Formatted prompt for AI resume optimization
     """
     soc_group = results.get("predicted_soc_group", "your target role")
     critical_domains = results.get("critical_domains", [])
@@ -131,12 +137,6 @@ st.markdown("""
 def load_ontology(ontology_path: str = "ontology.json") -> Optional[Dict]:
     """
     Load and cache the keyword ontology from JSON file.
-
-    Args:
-        ontology_path: Path to the ontology JSON file
-        
-    Returns:
-        Dict or None: Ontology data or None if loading fails
     """
     if not os.path.exists(ontology_path):
         st.error(f"⚠️ Ontology file not found at '{ontology_path}'. Please ensure the file exists.")
@@ -163,12 +163,6 @@ def load_ontology(ontology_path: str = "ontology.json") -> Optional[Dict]:
 def validate_file(file) -> bool:
     """
     Validate uploaded file size and type.
-
-    Args:
-        file: Streamlit UploadedFile object
-        
-    Returns:
-        bool: True if valid, False otherwise
     """
     if file is None:
         return False
@@ -189,12 +183,6 @@ def validate_file(file) -> bool:
 def extract_text_from_file(file) -> str:
     """
     Extract text content from uploaded file (PDF or TXT).
-
-    Args:
-        file: Streamlit UploadedFile object
-        
-    Returns:
-        str: Extracted text content
     """
     if not validate_file(file):
         return ""
@@ -235,13 +223,6 @@ def extract_text_from_file(file) -> str:
 def clean_and_extract_words(text: str, preserve_phrases: bool = True) -> Set[str]:
     """
     Extract and clean words from text, optionally preserving multi-word phrases.
-
-    Args:
-        text: Raw text to process
-        preserve_phrases: Whether to extract 2-3 word phrases
-        
-    Returns:
-        Set[str]: Cleaned unique words/phrases
     """
     if not text:
         return set()
@@ -270,20 +251,10 @@ def clean_and_extract_words(text: str, preserve_phrases: bool = True) -> Set[str
 
     return words
 
-from typing import Dict, Set, List, Tuple, Optional
-
 @st.cache_data(show_spinner="Analyzing documents...")
 def run_ontological_analysis(resume_file, jd_file, ontology: Dict, soc_override: Optional[str] = None) -> Optional[Dict]:
     """
     Perform comprehensive ontological analysis of resume against job description.
-
-    Args:
-        resume_file: Uploaded resume file
-        jd_file: Uploaded job description file
-        ontology: Loaded ontology dictionary
-        
-    Returns:
-        Dict or None: Analysis results or None if analysis fails
     """
     # Extract text from files
     resume_text = extract_text_from_file(resume_file)
@@ -321,49 +292,60 @@ def run_ontological_analysis(resume_file, jd_file, ontology: Dict, soc_override:
             domain_keywords.update(phrase_lower.split())
         domain_keyword_map[domain_name] = domain_keywords
 
-    # Predict SOC group with improved scoring
-    # Respect manual override if provided
+    # IMPROVED SOC GROUP PREDICTION
     best_soc_group, max_soc_score = None, -1
     soc_scores = {}
+    
     # Respect manual override if provided
     if soc_override and soc_override != "Auto Detect" and soc_override in soc_groups:
         best_soc_group = soc_override
         max_soc_score = 100.0
-        # Assign perfect score to override, and fill soc_scores accordingly
+        # Fill soc_scores
         for group_name in soc_groups:
             soc_scores[group_name] = 100.0 if group_name == soc_override else 0.0
-    if not best_soc_group:  # proceed with automatic detection only if no override
+    else:
+        # Automatic detection with improved logic
         for group_name, group_data in soc_groups.items():
             group_keywords = set()
             triggered_domains = 0
-            triggered_domain_names = []
+            domain_scores = []
+            
             for domain in group_data.get("signal_domains", []):
                 if domain in domain_keyword_map:
-                    group_keywords.update(domain_keyword_map[domain])
-                    if domain_keyword_map[domain].intersection(jd_words):
+                    domain_keywords = domain_keyword_map[domain]
+                    group_keywords.update(domain_keywords)
+                    
+                    # Check if this domain is present in JD
+                    domain_jd_keywords = domain_keywords.intersection(jd_words)
+                    if domain_jd_keywords:
                         triggered_domains += 1
-                        triggered_domain_names.append(domain)
+                        # Calculate domain score
+                        matched_keywords = domain_jd_keywords.intersection(resume_words)
+                        domain_score = len(matched_keywords) / len(domain_jd_keywords) if domain_jd_keywords else 0
+                        domain_scores.append(domain_score)
 
-            relevant_jd_keywords = jd_words.intersection(group_keywords)
-
-            if relevant_jd_keywords:
-                matched_keywords = resume_words.intersection(relevant_jd_keywords)
-                weighted_score = sum(2 if ' ' in kw else 1 for kw in matched_keywords)
-                total_weight = sum(2 if ' ' in kw else 1 for kw in relevant_jd_keywords)
-                score = (weighted_score / total_weight) * 100 if total_weight > 0 else 0
+            # Calculate overall group score
+            if triggered_domains >= 2:  # Reduced threshold
+                # Weight by domain performance
+                avg_domain_score = sum(domain_scores) / len(domain_scores) if domain_scores else 0
+                
+                # Bonus for having more triggered domains
+                domain_bonus = min(triggered_domains / len(group_data.get("signal_domains", [])), 1.0)
+                
+                # Final score
+                score = (avg_domain_score * 0.7 + domain_bonus * 0.3) * 100
+                
+                # Boost for highly relevant groups
+                if any(keyword in jd_text.lower() for keyword in ['project manager', 'project management', 'agile', 'scrum']):
+                    if 'management' in group_name.lower():
+                        score *= 1.3
+                    elif 'computer' in group_name.lower():
+                        score *= 1.2
+                        
             else:
                 score = 0
-
-            # Only accept SOC groups with 3+ domains that have >0% match (i.e., present in JD)
-            if triggered_domains < 3:
-                score = 0
-            # Deprioritize any match where fewer than 2 signal domains were triggered
-            elif triggered_domains < 2:
-                score *= 0.6  # reduce confidence by 40%
-            if score < 25:
-                score = 0
                 
-            soc_scores[group_name] = score
+            soc_scores[group_name] = round(score, 1)
             if score > max_soc_score:
                 max_soc_score, best_soc_group = score, group_name
 
@@ -390,7 +372,7 @@ def run_ontological_analysis(resume_file, jd_file, ontology: Dict, soc_override:
                 gap_list = sorted(list(gaps), key=lambda x: jd_text.lower().find(x))
                 domain_gaps[domain_name] = gap_list[:20]  # Limit to top 20 gaps
 
-    # Calculate overall score
+    # Calculate overall score (IMPROVED)
     if all_jd_keywords:
         overall_matched = all_jd_keywords.intersection(resume_words)
         overall_score = (len(overall_matched) / len(all_jd_keywords)) * 100
@@ -414,28 +396,6 @@ def run_ontological_analysis(resume_file, jd_file, ontology: Dict, soc_override:
         "jd_text": jd_text[:500] + "..." if len(jd_text) > 500 else jd_text,
         "suggested_titles": suggested_titles
     }
-
-def check_license_status(license_key: str) -> Optional[str]:
-    """
-    Securely check license status with proper error handling.
-
-    Args:
-        license_key: License key to validate
-        
-    Returns:
-        str or None: License tier or None if invalid
-    """
-    if not license_key:
-        return None
-        
-    try:
-        # Call the license validation function
-        tier = get_user_mode(license_key)
-        return tier if tier in ["pro", "enterprise"] else None
-    except Exception as e:
-        # Log error for debugging but don't expose details to user
-        st.error("⚠️ License validation failed. Please check your key and try again.")
-        return None
 
 # --- SIDEBAR UI ---
 
