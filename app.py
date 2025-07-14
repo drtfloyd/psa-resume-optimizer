@@ -268,8 +268,10 @@ def clean_and_extract_words(text: str, preserve_phrases: bool = True) -> Set[str
 
     return words
 
+from typing import Dict, Set, List, Tuple, Optional
+
 @st.cache_data(show_spinner="Analyzing documents...")
-def run_ontological_analysis(resume_file, jd_file, ontology: Dict) -> Optional[Dict]:
+def run_ontological_analysis(resume_file, jd_file, ontology: Dict, soc_override: Optional[str] = None) -> Optional[Dict]:
     """
     Perform comprehensive ontological analysis of resume against job description.
 
@@ -318,32 +320,40 @@ def run_ontological_analysis(resume_file, jd_file, ontology: Dict) -> Optional[D
         domain_keyword_map[domain_name] = domain_keywords
 
     # Predict SOC group with improved scoring
+    # Respect manual override if provided
     best_soc_group, max_soc_score = None, -1
     soc_scores = {}
-
-    for group_name, group_data in soc_groups.items():
-        # Get all keywords for this job category
-        group_keywords = set()
-        for domain in group_data.get("signal_domains", []):
-            if domain in domain_keyword_map:
-                group_keywords.update(domain_keyword_map[domain])
-        
-        # Find relevant keywords in job description
-        relevant_jd_keywords = jd_words.intersection(group_keywords)
-        
-        # Score resume alignment with weighted scoring
-        if relevant_jd_keywords:
-            matched_keywords = resume_words.intersection(relevant_jd_keywords)
-            # Weight multi-word phrases higher
-            weighted_score = sum(2 if ' ' in kw else 1 for kw in matched_keywords)
-            total_weight = sum(2 if ' ' in kw else 1 for kw in relevant_jd_keywords)
-            score = (weighted_score / total_weight) * 100 if total_weight > 0 else 0
-        else:
-            score = 0
-        
-        soc_scores[group_name] = score
-        if score > max_soc_score:
-            max_soc_score, best_soc_group = score, group_name
+    # Respect manual override if provided
+    if soc_override and soc_override != "Auto Detect" and soc_override in soc_groups:
+        best_soc_group = soc_override
+        max_soc_score = 100.0
+        # Assign perfect score to override, and fill soc_scores accordingly
+        for group_name in soc_groups:
+            soc_scores[group_name] = 100.0 if group_name == soc_override else 0.0
+    if not best_soc_group:  # proceed with automatic detection only if no override
+        for group_name, group_data in soc_groups.items():
+            # Get all keywords for this job category
+            group_keywords = set()
+            for domain in group_data.get("signal_domains", []):
+                if domain in domain_keyword_map:
+                    group_keywords.update(domain_keyword_map[domain])
+            
+            # Find relevant keywords in job description
+            relevant_jd_keywords = jd_words.intersection(group_keywords)
+            
+            # Score resume alignment with weighted scoring
+            if relevant_jd_keywords:
+                matched_keywords = resume_words.intersection(relevant_jd_keywords)
+                # Weight multi-word phrases higher
+                weighted_score = sum(2 if ' ' in kw else 1 for kw in matched_keywords)
+                total_weight = sum(2 if ' ' in kw else 1 for kw in relevant_jd_keywords)
+                score = (weighted_score / total_weight) * 100 if total_weight > 0 else 0
+            else:
+                score = 0
+            
+            soc_scores[group_name] = score
+            if score > max_soc_score:
+                max_soc_score, best_soc_group = score, group_name
 
     # Calculate domain scores and gaps
     domain_scores, domain_gaps = {}, {}
@@ -442,6 +452,16 @@ with st.sidebar:
     # Load ontology regardless of license status
     ontology = load_ontology()
 
+    # Optional manual SOC override
+    if ontology:
+        soc_options = ["Auto Detect"] + sorted(ontology.get("SOC_Groups", {}).keys())
+        soc_choice = st.selectbox(
+            "🎛️ Optional: Target Job Category",
+            soc_options,
+            help="Force the analysis to use a specific job category if auto‑detect misfires."
+        )
+        st.session_state.soc_override = soc_choice
+
     # Main functionality - only available with valid license
     if st.session_state.license_tier in ["pro", "enterprise"]:
         st.success(f"✅ {st.session_state.license_tier.title()} License Active")
@@ -489,7 +509,12 @@ with st.sidebar:
             if resume_file and jd_file and ontology:
                 try:
                     with st.spinner("Performing deep ontological analysis..."):
-                        results = run_ontological_analysis(resume_file, jd_file, ontology)
+                        results = run_ontological_analysis(
+                            resume_file,
+                            jd_file,
+                            ontology,
+                            soc_override=st.session_state.get("soc_override")
+                        )
                         if results:
                             st.session_state.analysis_results = results
                             st.success("✅ Analysis Complete!")
@@ -560,6 +585,12 @@ if 'analysis_results' not in st.session_state or st.session_state.analysis_resul
         st.write("Generate targeted prompts for resume enhancement")
 
     st.info("👈 Enter your license key and upload documents in the sidebar to begin analysis")
+    st.markdown(
+        "<span style='color: #2c3e50; font-size: 16px;'>"
+        "Tip: If auto‑detect picks the wrong job category, select your target category in the sidebar and re‑run the analysis."
+        "</span>",
+        unsafe_allow_html=True
+    )
 
 else:
     # Display analysis results
@@ -710,45 +741,22 @@ else:
             for domain in sorted_domains:
                 gaps = domain_gaps[domain]
                 is_critical = domain in critical_domains
-                
                 # Create expander with emoji and count
                 emoji = "🔥" if is_critical else "📌"
                 severity = "Critical" if is_critical else "Important"
-                
                 with st.expander(
                     f"{emoji} **{domain}** - {len(gaps)} missing keywords ({severity})",
                     expanded=is_critical and len(gaps) > 3
                 ):
-                    # Display gaps as styled tags
-                    gap_html = '<div style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px;">'
-                    
-                    for i, word in enumerate(gaps[:20]):  # Limit display to 20
-                        color = "#e74c3c" if is_critical else "#f39c12"
-                        gap_html += f'''
-                        <span style="
-                            background-color: {color}; 
-                            color: white; 
-                            padding: 5px 12px; 
-                            border-radius: 15px; 
-                            font-size: 14px;
-                            font-weight: 500;
-                        ">{word}</span>
-                        '''
-                    
-                    if len(gaps) > 20:
-                        gap_html += f'''
-                        <span style="
-                            background-color: #95a5a6; 
-                            color: white; 
-                            padding: 5px 12px; 
-                            border-radius: 15px; 
-                            font-size: 14px;
-                        ">+{len(gaps) - 20} more</span>
-                        '''
-                    
-                    gap_html += "</div>"
-                    st.markdown(gap_html, unsafe_allow_html=True)
-                    
+                    # Display gaps using Streamlit-native components for safety and accessibility
+                    if gaps:
+                        st.markdown("#### Missing Keywords:", unsafe_allow_html=False)
+                        # Use st.code for a block, or st.text for each, or st.write as a list
+                        # We'll use st.write as a bulleted list for clarity and a native look
+                        show_gaps = gaps[:20]
+                        st.write('\n'.join([f"- {word}" for word in show_gaps]))
+                        if len(gaps) > 20:
+                            st.info(f"+{len(gaps) - 20} more keywords not shown")
                     # Add quick tips for critical domains
                     if is_critical:
                         st.info(f"💡 **Tip:** Adding 3-5 of these keywords could significantly improve your match score")
