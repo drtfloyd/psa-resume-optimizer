@@ -35,12 +35,12 @@ def calculate_trust_visibility_scores(results: Dict) -> Tuple[float, float]:
     critical_domains = set(results.get("critical_domains", []))
     domain_gaps = results.get("domain_gaps", {})
 
-    # Calculate trust score (average of critical domain scores)
-   trust_scores = sorted(
-    [score for domain, score in domain_scores.items() if domain in critical_domains],
-    reverse=True
-)[:5]
-trust_score = sum(trust_scores) / len(trust_scores) if trust_scores else 0
+    # Calculate trust score (average of top 5 critical domain scores)
+    trust_scores = sorted(
+        [score for domain, score in domain_scores.items() if domain in critical_domains],
+        reverse=True
+    )[:5]
+    trust_score = sum(trust_scores) / len(trust_scores) if trust_scores else 0
   
     # Calculate visibility score (domains with good coverage)
     if domain_gaps:
