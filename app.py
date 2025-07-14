@@ -88,6 +88,38 @@ def calculate_trust_visibility_scores(results: Dict) -> Tuple[float, float]:
 
     return round(trust_score, 1), round(visibility_score, 1)
 
+def generate_hyperprompt(results: Dict) -> str:
+    """
+    Generate an AI optimization prompt based on analysis results.
+
+    Args:
+        results: Analysis results dictionary
+        
+    Returns:
+        str: Formatted prompt for AI resume optimization
+    """
+    soc_group = results.get("predicted_soc_group", "your target role")
+    critical_domains = results.get("critical_domains", [])
+    domain_gaps = results.get("domain_gaps", {})
+
+    # Get top 5 missing keywords across all domains
+    top_gaps = []
+    for domain, gaps in domain_gaps.items():
+        if domain in critical_domains:
+            top_gaps.extend(gaps[:3])  # Take top 3 from each critical domain
+
+    prompt_parts = [
+        f"You are optimizing a resume for a role in {soc_group}.",
+        f"Critical skill domains: {', '.join(critical_domains)}."
+    ]
+
+    if top_gaps:
+        prompt_parts.append(f"Key missing terms to incorporate: {', '.join(top_gaps[:10])}.")
+
+    prompt_parts.append("Maintain authentic voice while strategically incorporating relevant terminology.")
+
+    return " ".join(prompt_parts)
+
 def generate_pdf_report(results: Dict) -> bytes:
     """
     Generate a comprehensive PDF report of the PSA analysis.
@@ -329,36 +361,7 @@ def create_domain_comparison_chart(current_results: Dict, history: List[Dict]) -
     )
     
     return fig
-    """
-    Generate an AI optimization prompt based on analysis results.
 
-    Args:
-        results: Analysis results dictionary
-        
-    Returns:
-        str: Formatted prompt for AI resume optimization
-    """
-    soc_group = results.get("predicted_soc_group", "your target role")
-    critical_domains = results.get("critical_domains", [])
-    domain_gaps = results.get("domain_gaps", {})
-
-    # Get top 5 missing keywords across all domains
-    top_gaps = []
-    for domain, gaps in domain_gaps.items():
-        if domain in critical_domains:
-            top_gaps.extend(gaps[:3])  # Take top 3 from each critical domain
-
-    prompt_parts = [
-        f"You are optimizing a resume for a role in {soc_group}.",
-        f"Critical skill domains: {', '.join(critical_domains)}."
-    ]
-
-    if top_gaps:
-        prompt_parts.append(f"Key missing terms to incorporate: {', '.join(top_gaps[:10])}.")
-
-    prompt_parts.append("Maintain authentic voice while strategically incorporating relevant terminology.")
-
-    return " ".join(prompt_parts)
 
 # --- Custom CSS for a Polished Look ---
 
@@ -826,7 +829,7 @@ with st.sidebar:
         
         # File upload section
         st.header("📂 Upload Documents")
-        
+
         col1, col2 = st.columns(2)
         with col1:
             st.caption("Step 1")
@@ -836,11 +839,19 @@ with st.sidebar:
                 key="resume_upload",
                 help="Upload your current resume for analysis. PDF or TXT format, max 10MB. The system will extract text and analyze your skill signals against the target job."
             )
-
-        # PDF Export Section
-        st.markdown("---")
-        col1, col2, col3 = st.columns([1, 2, 1])
         with col2:
+            st.caption("Step 2")
+            jd_file = st.file_uploader(
+                "Upload Job Description", 
+                type=["pdf", "txt"],
+                key="jd_upload",
+                help="Upload the job description for your target position. PDF or TXT format, max 10MB. PSA will analyze required skills and compare against your resume."
+            )
+
+        # PDF Export Section (remains between the columns)
+        st.markdown("---")
+        colpdf1, colpdf2, colpdf3 = st.columns([1, 2, 1])
+        with colpdf2:
             if st.button("📄 Download Analysis Report", 
                         use_container_width=True, 
                         type="secondary",
@@ -848,7 +859,6 @@ with st.sidebar:
                 try:
                     with st.spinner("Generating your personalized PSA report..."):
                         pdf_bytes = generate_pdf_report(results)
-                        
                         # Create download button
                         st.download_button(
                             label="📥 Download PDF Report",
@@ -862,17 +872,7 @@ with st.sidebar:
                 except Exception as e:
                     st.error(f"⚠️ Error generating PDF report: {str(e)}")
                     st.info("💡 Tip: Try refreshing the page and running the analysis again.")
-
         st.markdown("---")
-        
-        with col2:
-            st.caption("Step 2")
-            jd_file = st.file_uploader(
-                "Upload Job Description", 
-                type=["pdf", "txt"],
-                key="jd_upload",
-                help="Upload the job description for your target position. PDF or TXT format, max 10MB. PSA will analyze required skills and compare against your resume."
-            )
 
         # Store files in session state
         if resume_file:
@@ -993,183 +993,87 @@ else:
     results = st.session_state.analysis_results
 
     # Create tabs for different views
-    tab_names = ["📊 Strategic Scorecard", "🔍 Gap Analysis", "💼 Career Paths", "🤖 AI Optimizer", "📈 Advanced Insights", "📋 Progress Tracking"]
+    tab_names = ["📊 Strategic Scorecard",
+                 "🔍 Gap Analysis",
+                 "💼 Career Paths",
+                 "🤖 AI Optimizer",
+                 "📈 Advanced Insights",
+                 "📋 Progress Tracking"]
     tabs = st.tabs(tab_names)
 
     with tabs[0]:  # Strategic Scorecard
-        st.header("📝 Comprehensive Analysis Summary", help="Complete overview of your resume's alignment with the target position using PSA ontological analysis")
-        
-        # Main metrics
-        col1, col2, col3, col4 = st.columns(4)
-        
-        overall_score = results.get('overall_score', 0)
-        with col1:
-            st.metric(
-                "Overall Match", 
-                f"{overall_score:.1f}%",
-                f"{results.get('matched_keywords', 0)}/{results.get('total_jd_keywords', 0)} keywords",
-                help="Percentage of job description keywords found in your resume. Higher scores indicate stronger alignment with the target role."
-            )
-        
-        trust_score, visibility_score = calculate_trust_visibility_scores(results)
-        with col2:
-            st.metric(
-                "Trust Score", 
-                f"{trust_score}%",
-                delta=f"{trust_score - 50:.0f}" if trust_score != 0 else None,
-                help="Average performance in critical domains for your predicted role. Measures credibility and expertise signals in essential skill areas."
-            )
-        
-        with col3:
-            st.metric(
-                "Visibility Score", 
-                f"{visibility_score}%",
-                delta=f"{visibility_score - 50:.0f}" if visibility_score != 0 else None,
-                help="Percentage of domains where you show good coverage (>40%). Indicates how well your professional presence signals across multiple skill areas."
-            )
-        
-        with col4:
-            gap_count = sum(len(gaps) for gaps in results.get('domain_gaps', {}).values())
-            st.metric(
-                "Improvement Areas", 
-                gap_count,
-                "keywords to add",
-                help="Total number of strategic keywords missing from your resume. These represent optimization opportunities to increase your match score."
-            )
+        st.header("📊 Strategic Resume Match Scorecard", help="Understand your resume's alignment with the target role across key dimensions")
 
-        # Overall progress bar
-        st.markdown("### 🎯 Overall Resume Alignment", help="Visual representation of your resume's match strength with the target position")
-        progress_col1, progress_col2 = st.columns([3, 1])
-        with progress_col1:
-            st.progress(int(overall_score))
-        with progress_col2:
-            if overall_score >= 80:
-                st.success("Excellent Match!")
-            elif overall_score >= 60:
-                st.warning("Good Match")
-            else:
-                st.error("Needs Work")
-
-        # Predicted job category with confidence
-        st.markdown("### 🏢 Job Category Analysis", help="PSA's prediction of your best-fit career category based on skill domain analysis")
-        soc_group = results.get('predicted_soc_group')
-        if soc_group:
-            soc_scores = results.get('soc_scores', {})
-            top_score = soc_scores.get(soc_group, 0) if soc_scores else 0
-            
-            st.info(f"**Best Match:** {soc_group} (Confidence: {top_score:.0f}%)")
-            
-            # Show other potential matches if close
-            if soc_scores:
-                other_matches = [(k, v) for k, v in soc_scores.items() 
-                               if k != soc_group and v > top_score * 0.7]
-                if other_matches:
-                    st.caption("Other potential matches:")
-                    for match, score in sorted(other_matches, key=lambda x: x[1], reverse=True)[:3]:
-                        st.caption(f"• {match} ({score:.0f}%)")
+        if not results:
+            st.info("Upload your resume and job description to get started.")
         else:
-            st.warning("Could not determine job category - ontology may need updating")
+            col1, col2, col3 = st.columns(3)
+            col1.metric("Overall Match", f"{results.get('overall_score', 0)}%")
+            col2.metric("Trust Score", f"{results.get('trust_score', 0)}%")
+            col3.metric("Visibility Score", f"{results.get('visibility_score', 0)}%")
 
-        # Domain scores visualization
-        st.markdown("### 📊 Signal Domain Performance", help="Breakdown of your performance in each skill domain. Critical domains (🔥) are most important for your predicted role.")
-        critical_domains = set(results.get('critical_domains', []))
-        domain_scores = results.get('domain_scores', {})
-        
-        if domain_scores:
-            # Sort by score and critical status
-            sorted_scores = sorted(
-                domain_scores.items(), 
-                key=lambda x: (x[0] not in critical_domains, -x[1])
-            )
-            
-            for domain, score in sorted_scores:
-                col1, col2 = st.columns([3, 1])
-                with col1:
-                    label = f"**{domain}**" if domain in critical_domains else domain
-                    if domain in critical_domains:
-                        st.markdown(f"{label} 🔥")
-                    else:
-                        st.markdown(label)
-                    st.progress(int(score))
-                with col2:
-                    if score >= 80:
-                        st.success(f"{score:.0f}%")
-                    elif score >= 50:
-                        st.warning(f"{score:.0f}%")
-                    else:
-                        st.error(f"{score:.0f}%")
-        else:
-            st.write("No domain scores calculated - check ontology configuration")
+            st.markdown("### Skill Domain Alignment")
+            domain_scores = results.get("domain_scores", {})
+            critical_domains = set(results.get("critical_domains", []))
+
+            for domain, score in sorted(domain_scores.items(), key=lambda x: -x[1]):
+                bar = st.progress(score / 100)
+                label = f"🔥 {domain}" if domain in critical_domains else f"{domain}"
+                st.write(f"**{label}**: {score}%")
 
     with tabs[1]:  # Gap Analysis
-        st.header("🔍 Strategic Keyword Gap Analysis", help="Detailed breakdown of missing keywords that could strengthen your resume's alignment with the target position")
-        
-        domain_gaps = results.get('domain_gaps', {})
-        critical_domains = set(results.get('critical_domains', []))
-        
-        if domain_gaps:
-            # Summary stats
-            total_gaps = sum(len(gaps) for gaps in domain_gaps.values())
-            critical_gaps = sum(len(gaps) for domain, gaps in domain_gaps.items() 
-                              if domain in critical_domains)
-            
-            col1, col2, col3 = st.columns(3)
-            with col1:
-                st.metric(
-                    "Total Gaps", 
-                    total_gaps,
-                    help="Total number of relevant keywords missing from your resume across all skill domains"
-                )
-            with col2:
-                st.metric(
-                    "Critical Gaps", 
-                    critical_gaps, 
-                    help="Missing keywords in domains that are most important for your target role. Focus here for maximum impact."
-                )
-            with col3:
-                st.metric(
-                    "Affected Domains", 
-                    len(domain_gaps),
-                    help="Number of skill domains where keyword gaps were identified. Shows breadth of optimization opportunities."
-                )
-            
-            st.markdown("---")
-            
-            # Detailed gap analysis
-            st.markdown("### 📋 Missing Keywords by Domain")
-            st.caption("💡 Focus on critical domains (marked with 🔥) for maximum impact")
-            
-            # Sort domains by criticality and gap count
-            sorted_domains = sorted(
-                domain_gaps.keys(), 
-                key=lambda d: (d not in critical_domains, -len(domain_gaps[d]))
-            )
-            
-            for domain in sorted_domains:
-                gaps = domain_gaps[domain]
-                is_critical = domain in critical_domains
-                # Create expander with emoji and count
-                emoji = "🔥" if is_critical else "📌"
-                severity = "Critical" if is_critical else "Important"
-                with st.expander(
-                    f"{emoji} **{domain}** - {len(gaps)} missing keywords ({severity})",
-                    expanded=is_critical and len(gaps) > 3
-                ):
-                    # Display gaps using Streamlit-native components for safety and accessibility
-                    if gaps:
-                        st.markdown("#### Missing Keywords:", unsafe_allow_html=False)
-                        # Use st.code for a block, or st.text for each, or st.write as a list
-                        # We'll use st.write as a bulleted list for clarity and a native look
-                        show_gaps = gaps[:20]
-                        st.write('\n'.join([f"- {word}" for word in show_gaps]))
-                        if len(gaps) > 20:
-                            st.info(f"+{len(gaps) - 20} more keywords not shown")
-                    # Add quick tips for critical domains
-                    if is_critical:
-                        st.info(f"💡 **Tip:** Adding 3-5 of these keywords could significantly improve your match score")
+        st.header("🔍 Strategic Keyword Gap Analysis", help="Pinpoint missing keywords across key skill domains")
+
+        if not results:
+            st.warning("Run an analysis to view your keyword gaps.")
         else:
-            st.success("🎉 Excellent! No significant keyword gaps detected.")
-            st.write("Your resume appears to cover all major skill areas from the job description.")
+            st.markdown("The table below shows skill keywords grouped by domain. Keywords **not found** in your resume but present in the job description are marked in red.")
+
+            from itertools import zip_longest
+
+            # Prepare domain_keywords and resume_keywords for the table
+            # Reconstruct from analysis results
+            # domain_keywords: domain -> list of JD keywords (in job desc)
+            # resume_keywords: domain -> list of resume keywords (in resume)
+            # We'll reconstruct these from the analysis results.
+            domain_gaps = results.get("domain_gaps", {})
+            domain_scores = results.get("domain_scores", {})
+            critical_domains = set(results.get("critical_domains", []))
+
+            # To reconstruct domain_keywords and resume_keywords, use the intersection logic from run_enhanced_ontological_analysis
+            # However, for this table, we can only show what is available in results.
+            # We'll use domain_gaps and domain_scores to drive the display.
+            # For each domain, get all keywords that were looked for (gaps + matched)
+            # We'll need to show both: keywords found in resume (from JD), and keywords missing (from JD).
+            # So, for each domain, get all JD keywords (gaps + matched).
+
+            # For this, we need to reconstruct domain_keywords and resume_keywords
+            # But results doesn't include all JD keywords per domain directly, so we fallback:
+            # - domain_gaps[domain] = list of missing JD keywords for that domain
+            # - domain_scores[domain] = score (but not keywords)
+            # We'll try to get as close as possible:
+            # For display, treat domain_gaps as missing; for present, just show as "found".
+            # We'll show missing in red, present in normal.
+
+            # For best fidelity, if you want to use the original logic, you should pass domain_keywords and resume_keywords as part of results in run_enhanced_ontological_analysis,
+            # but for now, we will approximate.
+
+            # For demonstration, just show missing keywords in red, and (optionally) found ones as green check.
+            for domain in domain_gaps:
+                missing_terms = domain_gaps[domain]
+                # We don't know the full JD list, so display missing terms
+                st.markdown(f"#### 📂 {domain}")
+                if missing_terms:
+                    table = []
+                    for jt in missing_terms:
+                        row = [
+                            "",  # No resume term to show
+                            f"🟥 {jt}"
+                        ]
+                        table.append(row)
+                    st.table(table)
+                else:
+                    st.success("No missing keywords in this domain!")
 
     with tabs[2]:  # Career Paths
         st.header("💼 Career Path Recommendations", help="Suggested career trajectories and job titles based on your skill profile and domain strengths")
@@ -1220,62 +1124,18 @@ else:
             st.warning("Unable to determine career category - please check your uploaded files")
 
     with tabs[3]:  # AI Optimizer
-        st.header("🤖 AI-Powered Resume Optimization", help="Generate personalized prompts for AI assistants (ChatGPT, Claude, etc.) to optimize your resume based on your specific gap analysis")
-        
+        st.header("🤖 AI-Powered Resume Optimization", help="Generate a tailored prompt based on your gap analysis results")
+
         st.markdown("""
-        Use this customized prompt with ChatGPT, Claude, or any AI assistant to optimize your resume.
-        The prompt is specifically tailored to your gap analysis results.
+        Use this customized prompt with ChatGPT, Claude, or any AI assistant to optimize your resume. The prompt is specifically tailored to your gap analysis results.
         """)
-        
-        # Generate the hyperprompt
-        hyper_prompt = generate_hyperprompt(results)
-        
-        # Display in a nice text area with copy button
-        st.markdown("### 📝 Your Personalized AI Prompt", help="This prompt is automatically generated based on your specific gaps and target role. Copy it to use with any AI assistant.")
-        
-        prompt_container = st.container()
-        with prompt_container:
-            st.text_area(
-                "Copy this prompt:", 
-                hyper_prompt, 
-                height=150,
-                help="Select all text (Ctrl/Cmd+A) and copy (Ctrl/Cmd+C). Paste this into ChatGPT, Claude, or your preferred AI assistant along with your resume."
-            )
-        
-        # Additional instructions
-        st.markdown("### 🚀 How to Use This Prompt", help="Step-by-step guide for getting the best results from AI-powered resume optimization")
-        
-        with st.expander("Step-by-step instructions", expanded=True):
-            st.markdown("""
-            1. **Copy the prompt** above
-            2. **Paste your current resume** into your AI tool of choice
-            3. **Add the prompt** and ask the AI to rewrite specific sections
-            4. **Review suggestions** - maintain authenticity while adding keywords
-            5. **Iterate** - run the analysis again after updating
-            
-            **Pro Tips:**
-            - Focus on naturally incorporating keywords into achievements
-            - Don't stuff keywords - context matters
-            - Update your LinkedIn profile with the same optimizations
-            """)
-        
-        # Quick keyword reference
-        domain_gaps = results.get('domain_gaps', {})
-        critical_domains = results.get('critical_domains', [])
-        
-        if domain_gaps:
-            st.markdown("### 🎯 Priority Keywords to Incorporate", help="High-impact keywords from your critical domains. Focus on these for maximum improvement in your match score.")
 
-            # Get top keywords from critical domains
-            priority_keywords = []
-            for domain in critical_domains:
-                if domain in domain_gaps:
-                    priority_keywords.extend(domain_gaps[domain][:5])
-
-            if priority_keywords:
-                st.write("Focus on these high-impact terms:")
-                # Streamlit-safe rendering (no raw HTML)
-                st.write('\n'.join([f"- {kw}" for kw in priority_keywords[:15]]))
+        if "results" in st.session_state:
+            results = st.session_state["results"]
+            hyper_prompt = generate_hyperprompt(results)
+            st.text_area("🎯 Optimization Prompt", hyper_prompt, height=400)
+        else:
+            st.warning("Run a resume + job description analysis first.")
 
     with tabs[5]:  # Progress Tracking
         st.header("📋 Progress Tracking", help="Track your resume optimization journey over time with detailed analytics and improvement insights")
@@ -1500,6 +1360,43 @@ else:
                     st.write(f"{i}. **{keyword}**")
             else:
                 st.info("Focus on keywords from your important domains")
+
+
+    # --- Progress Tracking Tab ---
+    with tabs[5]:  # Progress Tracking
+        st.header("📋 Progress Tracking", help="Track your resume optimization journey over time with detailed analytics and improvement insights")
+
+        history = st.session_state.get('analysis_history', [])
+
+        if len(history) < 1:
+            st.info("🚀 **Start Your Optimization Journey!**")
+            st.write("""
+            Run an analysis, improve your resume, and re‑run to see your progress over time:
+            • Score improvements
+            • Domain‑specific changes
+            • Before/after comparisons
+            """)
+        else:
+            import pandas as pd
+            # Convert history to DataFrame for easier handling
+            df = pd.DataFrame(history)
+            df['analysis_number'] = range(1, len(df) + 1)
+
+            # Line chart of Overall, Trust, Visibility
+            fig = go.Figure()
+            fig.add_trace(go.Scatter(x=df['analysis_number'], y=df['overall_score'],
+                                     mode='lines+markers', name='Overall'))
+            fig.add_trace(go.Scatter(x=df['analysis_number'], y=df['trust_score'],
+                                     mode='lines+markers', name='Trust'))
+            fig.add_trace(go.Scatter(x=df['analysis_number'], y=df['visibility_score'],
+                                     mode='lines+markers', name='Visibility'))
+            fig.update_layout(title='Score Progress', xaxis_title='Analysis #', yaxis_title='Score (%)')
+            st.plotly_chart(fig, use_container_width=True)
+
+            # Show simple table
+            df_display = df[['analysis_number', 'overall_score', 'trust_score', 'visibility_score', 'total_gaps']]
+            df_display.columns = ['Run', 'Overall %', 'Trust %', 'Visibility %', 'Total Gaps']
+            st.dataframe(df_display, use_container_width=True)
 
 # Footer
 st.markdown("---")
