@@ -1103,39 +1103,49 @@ else:
 
             from itertools import zip_longest
 
-            # --- Begin Original Gap Analysis Module ---
-            # To use the original logic, we need domain_keywords and resume_keywords.
-            # We'll reconstruct them as best as possible from the available results.
-            # For demonstration, we'll do a best-effort approximation.
-            # If you want full fidelity, pass these in run_enhanced_ontological_analysis.
-
-            # Try to reconstruct domain_keywords and resume_keywords
-            # We'll use domain_gaps for missing, and for present we'll simulate as empty for now.
-            # This preserves the original table structure.
+            # Prepare domain_keywords and resume_keywords for the table
+            # Reconstruct from analysis results
+            # domain_keywords: domain -> list of JD keywords (in job desc)
+            # resume_keywords: domain -> list of resume keywords (in resume)
+            # We'll reconstruct these from the analysis results.
             domain_gaps = results.get("domain_gaps", {})
             domain_scores = results.get("domain_scores", {})
             critical_domains = set(results.get("critical_domains", []))
 
-            # For demonstration, treat all missing terms as those in domain_gaps, and show them in red.
-            # No information on matched terms, so only missing are shown.
-            for domain, jd_terms in domain_gaps.items():
-                resume_terms = []  # No info, so empty
-                missing_terms = list(jd_terms)
+            # To reconstruct domain_keywords and resume_keywords, use the intersection logic from run_enhanced_ontological_analysis
+            # However, for this table, we can only show what is available in results.
+            # We'll use domain_gaps and domain_scores to drive the display.
+            # For each domain, get all keywords that were looked for (gaps + matched)
+            # We'll need to show both: keywords found in resume (from JD), and keywords missing (from JD).
+            # So, for each domain, get all JD keywords (gaps + matched).
 
-                if len(jd_terms) == 0:
-                    continue
+            # For this, we need to reconstruct domain_keywords and resume_keywords
+            # But results doesn't include all JD keywords per domain directly, so we fallback:
+            # - domain_gaps[domain] = list of missing JD keywords for that domain
+            # - domain_scores[domain] = score (but not keywords)
+            # We'll try to get as close as possible:
+            # For display, treat domain_gaps as missing; for present, just show as "found".
+            # We'll show missing in red, present in normal.
 
+            # For best fidelity, if you want to use the original logic, you should pass domain_keywords and resume_keywords as part of results in run_enhanced_ontological_analysis,
+            # but for now, we will approximate.
+
+            # For demonstration, just show missing keywords in red, and (optionally) found ones as green check.
+            for domain in domain_gaps:
+                missing_terms = domain_gaps[domain]
+                # We don't know the full JD list, so display missing terms
                 st.markdown(f"#### 📂 {domain}")
-                table = []
-                for rt, jt in zip_longest(resume_terms, jd_terms):
-                    row = [
-                        f"✅ {rt}" if rt in resume_terms else "",
-                        f"🟥 {jt}" if jt in missing_terms else f"{jt}"
-                    ]
-                    table.append(row)
-
-                st.table(table)
-            # --- End Original Gap Analysis Module ---
+                if missing_terms:
+                    table = []
+                    for jt in missing_terms:
+                        row = [
+                            "",  # No resume term to show
+                            f"🟥 {jt}"
+                        ]
+                        table.append(row)
+                    st.table(table)
+                else:
+                    st.success("No missing keywords in this domain!")
 
     with tabs[2]:  # Career Paths
         st.header("💼 Career Path Recommendations", help="Suggested career trajectories and job titles based on your skill profile and domain strengths")
