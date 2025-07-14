@@ -100,6 +100,161 @@ st.markdown("""
         padding-left: 5rem;
         padding-right: 5rem;
     }
+
+@st.cache_data(show_spinner="Analyzing documents...")
+def debug_ontological_analysis(resume_file, jd_file, ontology: Dict, soc_override: Optional[str] = None) -> Optional[Dict]:
+    """
+    DEBUG VERSION: Shows what keywords are being extracted and matched
+    """
+    # Extract text from files
+    resume_text = extract_text_from_file(resume_file)
+    jd_text = extract_text_from_file(jd_file)
+
+    if not resume_text:
+        st.error("⚠️ Could not extract text from resume")
+        return None
+    if not jd_text:
+        st.error("⚠️ Could not extract text from job description")
+        return None
+
+    # Extract words and phrases
+    resume_words = clean_and_extract_words(resume_text)
+    jd_words = clean_and_extract_words(jd_text)
+
+    # DEBUG: Show extracted keywords
+    st.write("### 🔍 DEBUG: Extracted Keywords")
+    
+    with st.expander("Resume Keywords (first 50)", expanded=False):
+        resume_list = sorted(list(resume_words))[:50]
+        st.write(", ".join(resume_list))
+    
+    with st.expander("Job Description Keywords (first 50)", expanded=False):
+        jd_list = sorted(list(jd_words))[:50]
+        st.write(", ".join(jd_list))
+    
+    # DEBUG: Show direct overlap
+    direct_overlap = resume_words.intersection(jd_words)
+    st.write(f"**Direct keyword overlap:** {len(direct_overlap)} keywords")
+    if direct_overlap:
+        with st.expander("Direct Overlapping Keywords", expanded=True):
+            st.write(", ".join(sorted(direct_overlap)))
+
+    if not resume_words:
+        st.error("⚠️ No valid content found in resume")
+        return None
+    if not jd_words:
+        st.error("⚠️ No valid content found in job description")
+        return None
+
+    signal_domains = ontology.get("SignalDomains", {})
+    soc_groups = ontology.get("SOC_Groups", {})
+
+    # DEBUG: Show ontology keywords for a few domains
+    st.write("### 🔍 DEBUG: Ontology Keywords")
+    sample_domains = ["Leadership & Influence", "Systems & Structure", "AI & Technical Literacy"]
+    
+    for domain in sample_domains:
+        if domain in signal_domains:
+            with st.expander(f"Ontology: {domain}", expanded=False):
+                st.write(", ".join(signal_domains[domain]))
+
+    # Pre-compute domain keywords for efficiency
+    domain_keyword_map = {}
+    for domain_name, keywords in signal_domains.items():
+        domain_keywords = set()
+        for phrase in keywords:
+            # Add both the full phrase and individual words
+            phrase_lower = phrase.lower()
+            domain_keywords.add(phrase_lower)
+            domain_keywords.update(phrase_lower.split())
+        domain_keyword_map[domain_name] = domain_keywords
+
+    # DEBUG: Show processed domain keywords
+    st.write("### 🔍 DEBUG: Processed Domain Keywords")
+    for domain in sample_domains:
+        if domain in domain_keyword_map:
+            with st.expander(f"Processed: {domain}", expanded=False):
+                keywords = sorted(list(domain_keyword_map[domain]))[:20]
+                st.write(", ".join(keywords))
+
+    # Calculate domain scores and gaps with DEBUG info
+    domain_scores, domain_gaps = {}, {}
+    all_jd_keywords = set()
+    
+    st.write("### 🔍 DEBUG: Domain Matching")
+    
+    for domain_name, domain_keywords in domain_keyword_map.items():
+        # Find domain keywords in job description
+        domain_jd_keywords = domain_keywords.intersection(jd_words)
+        
+        if domain_jd_keywords:
+            all_jd_keywords.update(domain_jd_keywords)
+            
+            # Calculate match score
+            matched_keywords = domain_jd_keywords.intersection(resume_words)
+            score = (len(matched_keywords) / len(domain_jd_keywords)) * 100
+            domain_scores[domain_name] = round(score, 1)
+            
+            # DEBUG: Show matching details for important domains
+            if domain_name in ["Leadership & Influence", "Systems & Structure", "AI & Technical Literacy"]:
+                with st.expander(f"DEBUG: {domain_name} Matching", expanded=False):
+                    st.write(f"**JD Keywords found:** {len(domain_jd_keywords)}")
+                    st.write(f"**Resume matches:** {len(matched_keywords)}")
+                    st.write(f"**Score:** {score:.1f}%")
+                    if len(domain_jd_keywords) <= 20:
+                        st.write(f"**JD Keywords:** {', '.join(sorted(domain_jd_keywords))}")
+                    if matched_keywords:
+                        st.write(f"**Matched:** {', '.join(sorted(matched_keywords))}")
+            
+            # Find gaps
+            gaps = domain_jd_keywords - resume_words
+            if gaps:
+                gap_list = sorted(list(gaps))
+                domain_gaps[domain_name] = gap_list[:20]
+
+    # Calculate overall score
+    if all_jd_keywords:
+        overall_matched = all_jd_keywords.intersection(resume_words)
+        overall_score = (len(overall_matched) / len(all_jd_keywords)) * 100
+        
+        # DEBUG: Overall scoring
+        st.write("### 🔍 DEBUG: Overall Scoring")
+        st.write(f"**Total JD keywords from ontology:** {len(all_jd_keywords)}")
+        st.write(f"**Matched keywords:** {len(overall_matched)}")
+        st.write(f"**Overall score:** {overall_score:.1f}%")
+        
+        with st.expander("All Matched Keywords", expanded=True):
+            if overall_matched:
+                st.write(", ".join(sorted(overall_matched)))
+            else:
+                st.write("No matches found!")
+    else:
+        overall_score = 0
+        st.write("### 🔍 DEBUG: No JD keywords found in ontology!")
+
+    # Simple SOC prediction for debugging
+    best_soc_group = "Management Occupations"  # Default for testing
+    soc_scores = {"Management Occupations": 75.0}
+    critical_domains = ["Leadership & Influence", "Systems & Structure", "Outcomes & Impact"]
+    suggested_titles = ["IT Project Manager", "Operations Manager", "Program Manager"]
+
+    return {
+        "predicted_soc_group": best_soc_group,
+        "soc_scores": soc_scores,
+        "critical_domains": critical_domains,
+        "domain_scores": domain_scores,
+        "domain_gaps": domain_gaps,
+        "overall_score": round(overall_score, 1),
+        "total_jd_keywords": len(all_jd_keywords),
+        "matched_keywords": len(all_jd_keywords.intersection(resume_words)),
+        "resume_text": resume_text[:500] + "..." if len(resume_text) > 500 else resume_text,
+        "jd_text": jd_text[:500] + "..." if len(jd_text) > 500 else jd_text,
+        "suggested_titles": suggested_titles,
+        # DEBUG INFO
+        "debug_resume_words": len(resume_words),
+        "debug_jd_words": len(jd_words),
+        "debug_direct_overlap": len(direct_overlap)
+    }
     h1, h2, h3 {
         color: #2c3e50;
     }
@@ -481,7 +636,7 @@ with st.sidebar:
             if resume_file and jd_file and ontology:
                 try:
                     with st.spinner("Performing deep ontological analysis..."):
-                        results = run_ontological_analysis(
+                        results = debug_ontological_analysis(
                             resume_file,
                             jd_file,
                             ontology,
