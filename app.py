@@ -16,7 +16,7 @@ from collections import defaultdict
 from typing import Dict, Set, List, Tuple, Optional
 from datetime import datetime
 import base64
-from fpdf2 import FPDF2
+from fpdf import FPDF
 import pandas as pd
 
 import plotly.graph_objects as go
