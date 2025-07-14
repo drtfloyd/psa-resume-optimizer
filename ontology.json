@@ -36,8 +36,8 @@
     "AI & Technical Literacy": [
   "AI", "machine learning", "automation", "digital fluency", "tools", "algorithms", "prompting", "data modeling", "tech stack", "interface",
   "usability testing", "ethnography", "research operations", "UX", "user research", "human-computer interaction"
-],
-    },     
+]
+    }     
   "SOC_Groups": {
     "Management Occupations": {
       "example_titles": ["Executives", "Operations Managers", "Education Administrators"],
