@@ -151,7 +151,7 @@ def generate_pdf_report(results: dict) -> bytes:
                 kw_cleaned = kw.encode('latin-1', 'replace').decode('latin-1')
                 pdf.cell(0, 10, f" - {kw_cleaned}", ln=True)
 
-    return pdf.output(dest='S').encode('latin-1')
+    return pdf.output(dest='S')
 
 def save_analysis_to_history(results: Dict):
     """Save current analysis to session history for progress tracking."""
