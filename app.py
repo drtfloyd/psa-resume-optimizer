@@ -613,44 +613,46 @@ else:
     tabs = st.tabs(tab_names)
 
     with tabs[0]:  # Strategic Scorecard
+        # --- Comprehensive Analysis Summary with tooltips ---
         st.header("📝 Comprehensive Analysis Summary")
-        
+        # Tooltip explanations for sub-metrics
+        overall_match_help = "Percentage of total keywords from the job description found in your resume."
+        trust_score_help = "Represents alignment with critical domains. Higher scores suggest stronger domain credibility."
+        visibility_score_help = "Indicates how many non-critical but relevant domains are addressed. Gaps reduce discoverability."
+        improvement_areas_help = "Total number of missing keywords across all domains."
+
         # Main metrics
         col1, col2, col3, col4 = st.columns(4)
-        
         overall_score = results.get('overall_score', 0)
         with col1:
             st.metric(
                 "Overall Match", 
                 f"{overall_score:.1f}%",
                 f"{results.get('matched_keywords', 0)}/{results.get('total_jd_keywords', 0)} keywords",
-                help="Percentage of job description keywords found in your resume"
+                help=overall_match_help
             )
-        
         trust_score, visibility_score = calculate_trust_visibility_scores(results)
         with col2:
             st.metric(
                 "Trust Score", 
                 f"{trust_score}%",
                 delta=f"{trust_score - 50:.0f}" if trust_score != 0 else None,
-                help="Alignment with trust-critical domains for your role"
+                help=trust_score_help
             )
-        
         with col3:
             st.metric(
                 "Visibility Score", 
                 f"{visibility_score}%",
                 delta=f"{visibility_score - 50:.0f}" if visibility_score != 0 else None,
-                help="Signal strength and clarity of your professional presence"
+                help=visibility_score_help
             )
-        
         with col4:
             gap_count = sum(len(gaps) for gaps in results.get('domain_gaps', {}).values())
             st.metric(
                 "Improvement Areas", 
                 gap_count,
                 "keywords to add",
-                help="Total missing keywords across all domains"
+                help=improvement_areas_help
             )
 
         # Overall progress bar
@@ -666,18 +668,24 @@ else:
             else:
                 st.error("Needs Work")
 
-        # Predicted job category with confidence
-        st.markdown("### 🏢 Job Category Analysis")
+        # --- Job Category Analysis with tooltip ---
+        st.markdown(
+            "### 🏢 Job Category Analysis "
+            "<span style='font-size: 0.9em;'>"
+            "<span title=\"Your resume is matched against U.S. Bureau of Labor Statistics job families using keyword and domain similarity.\" style='cursor: help;'>[?]</span> "
+            "ℹ️ Best match is based on your resume’s alignment with signal domain patterns extracted from job descriptions."
+            "</span>",
+            unsafe_allow_html=True
+        )
         soc_group = results.get('predicted_soc_group')
         if soc_group:
             soc_scores = results.get('soc_scores', {})
             top_score = soc_scores.get(soc_group, 0) if soc_scores else 0
-            
-            st.info(f"**Best Match:** {soc_group} (Confidence: {top_score:.0f}%)")
-            
+            st.markdown(f"**Best Match:** {soc_group} (Confidence: {top_score:.0f}%) 🛈")
+            st.caption("🛈 This match is based on how your resume language aligns with occupational classifications in the U.S. SOC system, comparing domain keywords and job title associations.")
             # Show other potential matches if close
             if soc_scores:
-                other_matches = [(k, v) for k, v in soc_scores.items() 
+                other_matches = [(k, v) for k, v in soc_scores.items()
                                if k != soc_group and v > top_score * 0.7]
                 if other_matches:
                     st.caption("Other potential matches:")
@@ -686,18 +694,23 @@ else:
         else:
             st.warning("Could not determine job category - ontology may need updating")
 
-        # Domain scores visualization
-        st.markdown("### 📊 Signal Domain Performance")
+        # --- Signal Domain Performance with tooltip ---
+        st.markdown(
+            "## 📊 Signal Domain Performance "
+            "<span style='font-size: 0.85em;'>"
+            "<span title=\"These scores represent how strongly your resume reflects each critical skill domain.\" style='cursor: help;'>[?]</span> "
+            "ℹ️ This shows how strongly your resume matches each signal domain."
+            "</span>",
+            unsafe_allow_html=True
+        )
         critical_domains = set(results.get('critical_domains', []))
         domain_scores = results.get('domain_scores', {})
-        
         if domain_scores:
             # Sort by score and critical status
             sorted_scores = sorted(
                 domain_scores.items(), 
                 key=lambda x: (x[0] not in critical_domains, -x[1])
             )
-            
             for domain, score in sorted_scores:
                 col1, col2 = st.columns([3, 1])
                 with col1:
@@ -718,7 +731,14 @@ else:
             st.write("No domain scores calculated - check ontology configuration")
 
     with tabs[1]:  # Gap Analysis
-        st.header("🔍 Strategic Keyword Gap Analysis")
+        # --- Strategic Keyword Gap Analysis with tooltip ---
+        st.markdown(
+            "🔍 Strategic Keyword Gap Analysis "
+            "<span style='font-size: 0.9em;'>"
+            "<span title='Identify which keywords and phrases from the job description are missing from your resume.' style='cursor: help;'>[?]</span>"
+            "</span>",
+            unsafe_allow_html=True
+        )
         
         domain_gaps = results.get('domain_gaps', {})
         critical_domains = set(results.get('critical_domains', []))
@@ -734,7 +754,7 @@ else:
                 st.metric("Total Gaps", total_gaps)
             with col2:
                 st.metric("Critical Gaps", critical_gaps, 
-                         help="Gaps in domains critical for your target role")
+                         help="These are missing keywords in core domains that are essential for trust scoring.")
             with col3:
                 st.metric("Affected Domains", len(domain_gaps))
             
