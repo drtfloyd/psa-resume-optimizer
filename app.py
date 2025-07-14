@@ -1,3 +1,8 @@
+# === PSA™ RESUME OPTIMIZER - ENHANCED VERSION ===
+# New Features: PDF Export + Progress Tracking
+# Additional Dependencies Required:
+# pip install reportlab pandas plotly
+
 from psa_license.license import get_user_mode
 import streamlit as st
 from PyPDF2 import PdfReader
@@ -9,6 +14,16 @@ import json
 import os
 from collections import defaultdict
 from typing import Dict, Set, List, Tuple, Optional
+from datetime import datetime
+import base64
+from reportlab.lib.pagesizes import letter
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.lib.units import inch
+from reportlab.lib import colors
+import pandas as pd
+import plotly.express as px
+import plotly.graph_objects as go
 
 # --- CONFIGURATION ---
 
@@ -73,7 +88,247 @@ def calculate_trust_visibility_scores(results: Dict) -> Tuple[float, float]:
 
     return round(trust_score, 1), round(visibility_score, 1)
 
-def generate_hyperprompt(results: Dict) -> str:
+def generate_pdf_report(results: Dict) -> bytes:
+    """
+    Generate a comprehensive PDF report of the PSA analysis.
+    
+    Args:
+        results: Analysis results dictionary
+        
+    Returns:
+        bytes: PDF file content
+    """
+    buffer = io.BytesIO()
+    doc = SimpleDocTemplate(buffer, pagesize=letter, topMargin=0.5*inch)
+    styles = getSampleStyleSheet()
+    story = []
+    
+    # Custom styles
+    title_style = ParagraphStyle(
+        'CustomTitle',
+        parent=styles['Heading1'],
+        fontSize=24,
+        textColor=colors.HexColor('#2c3e50'),
+        spaceAfter=30,
+        alignment=1  # Center
+    )
+    
+    header_style = ParagraphStyle(
+        'CustomHeader',
+        parent=styles['Heading2'],
+        fontSize=16,
+        textColor=colors.HexColor('#3498db'),
+        spaceAfter=12
+    )
+    
+    # Title
+    story.append(Paragraph("PSA™ Resume Analysis Report", title_style))
+    story.append(Paragraph(f"Generated on {datetime.now().strftime('%B %d, %Y at %I:%M %p')}", styles['Normal']))
+    story.append(Spacer(1, 20))
+    
+    # Executive Summary
+    story.append(Paragraph("Executive Summary", header_style))
+    
+    overall_score = results.get('overall_score', 0)
+    trust_score, visibility_score = calculate_trust_visibility_scores(results)
+    soc_group = results.get('predicted_soc_group', 'Unknown')
+    
+    summary_data = [
+        ['Metric', 'Score', 'Status'],
+        ['Overall Match', f"{overall_score:.1f}%", 'Excellent' if overall_score >= 80 else 'Good' if overall_score >= 60 else 'Needs Work'],
+        ['Trust Score', f"{trust_score:.1f}%", 'Strong' if trust_score >= 70 else 'Moderate' if trust_score >= 40 else 'Developing'],
+        ['Visibility Score', f"{visibility_score:.1f}%", 'Clear' if visibility_score >= 70 else 'Moderate' if visibility_score >= 40 else 'Emerging'],
+        ['Predicted Role', soc_group, 'Best Match']
+    ]
+    
+    summary_table = Table(summary_data, colWidths=[2*inch, 1*inch, 1.5*inch])
+    summary_table.setStyle(TableStyle([
+        ('BACKGROUND', (0,0), (-1,0), colors.HexColor('#3498db')),
+        ('TEXTCOLOR', (0,0), (-1,0), colors.whitesmoke),
+        ('ALIGN', (0,0), (-1,-1), 'CENTER'),
+        ('FONTNAME', (0,0), (-1,0), 'Helvetica-Bold'),
+        ('FONTSIZE', (0,0), (-1,0), 12),
+        ('BOTTOMPADDING', (0,0), (-1,0), 12),
+        ('BACKGROUND', (0,1), (-1,-1), colors.beige),
+        ('GRID', (0,0), (-1,-1), 1, colors.black)
+    ]))
+    
+    story.append(summary_table)
+    story.append(Spacer(1, 20))
+    
+    # Domain Performance
+    story.append(Paragraph("Domain Performance Analysis", header_style))
+    
+    domain_scores = results.get('domain_scores', {})
+    critical_domains = set(results.get('critical_domains', []))
+    
+    if domain_scores:
+        domain_data = [['Domain', 'Score', 'Critical', 'Recommendation']]
+        for domain, score in sorted(domain_scores.items(), key=lambda x: x[1], reverse=True):
+            is_critical = domain in critical_domains
+            recommendation = 'Excellent' if score >= 80 else 'Strong' if score >= 60 else 'Needs Development'
+            domain_data.append([
+                domain,
+                f"{score:.1f}%",
+                'Yes' if is_critical else 'No',
+                recommendation
+            ])
+        
+        domain_table = Table(domain_data, colWidths=[2.5*inch, 1*inch, 0.8*inch, 1.2*inch])
+        domain_table.setStyle(TableStyle([
+            ('BACKGROUND', (0,0), (-1,0), colors.HexColor('#2c3e50')),
+            ('TEXTCOLOR', (0,0), (-1,0), colors.whitesmoke),
+            ('ALIGN', (0,0), (-1,-1), 'CENTER'),
+            ('FONTNAME', (0,0), (-1,0), 'Helvetica-Bold'),
+            ('FONTSIZE', (0,0), (-1,0), 10),
+            ('BOTTOMPADDING', (0,0), (-1,0), 12),
+            ('BACKGROUND', (0,1), (-1,-1), colors.lightgrey),
+            ('GRID', (0,0), (-1,-1), 1, colors.black),
+            ('FONTSIZE', (0,1), (-1,-1), 9)
+        ]))
+        
+        story.append(domain_table)
+        story.append(Spacer(1, 20))
+    
+    # Key Recommendations
+    story.append(Paragraph("Strategic Recommendations", header_style))
+    
+    domain_gaps = results.get('domain_gaps', {})
+    recommendations = []
+    
+    # Get top recommendations
+    for domain in critical_domains:
+        if domain in domain_gaps and len(domain_gaps[domain]) > 0:
+            top_gaps = domain_gaps[domain][:3]
+            recommendations.append(f"Strengthen {domain}: Add keywords like {', '.join(top_gaps)}")
+    
+    if not recommendations:
+        recommendations = ["Excellent alignment! Continue leveraging your strong skill profile."]
+    
+    for i, rec in enumerate(recommendations[:5], 1):
+        story.append(Paragraph(f"{i}. {rec}", styles['Normal']))
+        story.append(Spacer(1, 6))
+    
+    story.append(Spacer(1, 20))
+    
+    # Footer
+    story.append(Paragraph("This analysis was generated by PSA™ (Presence Signaling Architecture)", styles['Normal']))
+    story.append(Paragraph("Powered by AIaPI™ Framework | © 2024 All Rights Reserved", styles['Normal']))
+    
+    # Build PDF
+    doc.build(story)
+    buffer.seek(0)
+    return buffer.getvalue()
+
+def save_analysis_to_history(results: Dict):
+    """Save current analysis to session history for progress tracking."""
+    if 'analysis_history' not in st.session_state:
+        st.session_state.analysis_history = []
+    
+    # Create history entry
+    history_entry = {
+        'timestamp': datetime.now(),
+        'overall_score': results.get('overall_score', 0),
+        'trust_score': calculate_trust_visibility_scores(results)[0],
+        'visibility_score': calculate_trust_visibility_scores(results)[1],
+        'predicted_soc_group': results.get('predicted_soc_group'),
+        'domain_scores': results.get('domain_scores', {}),
+        'total_gaps': sum(len(gaps) for gaps in results.get('domain_gaps', {}).values()),
+        'critical_gaps': sum(len(gaps) for domain, gaps in results.get('domain_gaps', {}).items() 
+                           if domain in results.get('critical_domains', []))
+    }
+    
+    # Add to history (keep last 10 analyses)
+    st.session_state.analysis_history.append(history_entry)
+    if len(st.session_state.analysis_history) > 10:
+        st.session_state.analysis_history = st.session_state.analysis_history[-10:]
+
+def create_progress_chart(history: List[Dict]) -> go.Figure:
+    """Create a progress tracking chart from analysis history."""
+    if len(history) < 2:
+        return None
+    
+    df = pd.DataFrame(history)
+    df['analysis_number'] = range(1, len(df) + 1)
+    
+    fig = go.Figure()
+    
+    # Overall Score
+    fig.add_trace(go.Scatter(
+        x=df['analysis_number'],
+        y=df['overall_score'],
+        mode='lines+markers',
+        name='Overall Match',
+        line=dict(color='#3498db', width=3),
+        marker=dict(size=8)
+    ))
+    
+    # Trust Score
+    fig.add_trace(go.Scatter(
+        x=df['analysis_number'],
+        y=df['trust_score'],
+        mode='lines+markers',
+        name='Trust Score',
+        line=dict(color='#2ecc71', width=3),
+        marker=dict(size=8)
+    ))
+    
+    # Visibility Score
+    fig.add_trace(go.Scatter(
+        x=df['analysis_number'],
+        y=df['visibility_score'],
+        mode='lines+markers',
+        name='Visibility Score',
+        line=dict(color='#e74c3c', width=3),
+        marker=dict(size=8)
+    ))
+    
+    fig.update_layout(
+        title='Your PSA Progress Over Time',
+        xaxis_title='Analysis Session',
+        yaxis_title='Score (%)',
+        yaxis=dict(range=[0, 100]),
+        hovermode='x unified',
+        template='plotly_white'
+    )
+    
+    return fig
+
+def create_domain_comparison_chart(current_results: Dict, history: List[Dict]) -> go.Figure:
+    """Create domain comparison chart showing improvement areas."""
+    if len(history) < 2:
+        return None
+    
+    current_domains = current_results.get('domain_scores', {})
+    previous_domains = history[-2]['domain_scores']  # Second to last analysis
+    
+    domains = list(current_domains.keys())
+    current_scores = [current_domains.get(d, 0) for d in domains]
+    previous_scores = [previous_domains.get(d, 0) for d in domains]
+    improvements = [curr - prev for curr, prev in zip(current_scores, previous_scores)]
+    
+    # Color code by improvement
+    colors_list = ['#2ecc71' if imp > 0 else '#e74c3c' if imp < 0 else '#95a5a6' for imp in improvements]
+    
+    fig = go.Figure(data=[
+        go.Bar(
+            x=domains,
+            y=improvements,
+            marker_color=colors_list,
+            text=[f"{imp:+.1f}%" for imp in improvements],
+            textposition='auto'
+        )
+    ])
+    
+    fig.update_layout(
+        title='Domain Score Changes Since Last Analysis',
+        xaxis_title='Skill Domains',
+        yaxis_title='Score Change (%)',
+        template='plotly_white',
+        xaxis_tickangle=-45
+    )
+    
+    return fig
     """
     Generate an AI optimization prompt based on analysis results.
 
@@ -622,6 +877,34 @@ with st.sidebar:
                 key="resume_upload",
                 help="Upload your current resume for analysis. PDF or TXT format, max 10MB. The system will extract text and analyze your skill signals against the target job."
             )
+
+        # PDF Export Section
+        st.markdown("---")
+        col1, col2, col3 = st.columns([1, 2, 1])
+        with col2:
+            if st.button("📄 Download Analysis Report", 
+                        use_container_width=True, 
+                        type="secondary",
+                        help="Generate and download a comprehensive PDF report of your PSA analysis"):
+                try:
+                    with st.spinner("Generating your personalized PSA report..."):
+                        pdf_bytes = generate_pdf_report(results)
+                        
+                        # Create download button
+                        st.download_button(
+                            label="📥 Download PDF Report",
+                            data=pdf_bytes,
+                            file_name=f"PSA_Analysis_Report_{datetime.now().strftime('%Y%m%d_%H%M')}.pdf",
+                            mime="application/pdf",
+                            use_container_width=True,
+                            help="Click to save your comprehensive PSA analysis report"
+                        )
+                        st.success("✅ Report generated successfully!")
+                except Exception as e:
+                    st.error(f"⚠️ Error generating PDF report: {str(e)}")
+                    st.info("💡 Tip: Try refreshing the page and running the analysis again.")
+
+        st.markdown("---")
         
         with col2:
             st.caption("Step 2")
@@ -661,6 +944,8 @@ with st.sidebar:
                         )
                         if results:
                             st.session_state.analysis_results = results
+                            # Save to history for progress tracking
+                            save_analysis_to_history(results)
                             st.success("✅ Analysis Complete!")
                             st.balloons()
                         else:
@@ -749,7 +1034,7 @@ else:
     results = st.session_state.analysis_results
 
     # Create tabs for different views
-    tab_names = ["📊 Strategic Scorecard", "🔍 Gap Analysis", "💼 Career Paths", "🤖 AI Optimizer", "📈 Advanced Insights"]
+    tab_names = ["📊 Strategic Scorecard", "🔍 Gap Analysis", "💼 Career Paths", "🤖 AI Optimizer", "📈 Advanced Insights", "📋 Progress Tracking"]
     tabs = st.tabs(tab_names)
 
     with tabs[0]:  # Strategic Scorecard
@@ -1032,6 +1317,152 @@ else:
                 st.write("Focus on these high-impact terms:")
                 # Streamlit-safe rendering (no raw HTML)
                 st.write('\n'.join([f"- {kw}" for kw in priority_keywords[:15]]))
+
+    with tabs[5]:  # Progress Tracking
+        st.header("📋 Progress Tracking", help="Track your resume optimization journey over time with detailed analytics and improvement insights")
+        
+        # Check if we have history
+        history = st.session_state.get('analysis_history', [])
+        
+        if len(history) < 1:
+            st.info("🚀 **Start Your Optimization Journey!**")
+            st.write("""
+            This is your first PSA analysis. As you optimize your resume and re-run analyses, 
+            you'll see your progress tracked here with:
+            
+            - **Score improvements over time**
+            - **Domain-specific progress**  
+            - **Before/after comparisons**
+            - **Optimization trend analytics**
+            
+            💡 **Tip:** Run another analysis after making resume improvements to see your progress!
+            """)
+            
+        elif len(history) == 1:
+            st.info("📈 **Ready to Track Progress!**")
+            st.write("""
+            You've completed your baseline analysis. Make some resume improvements based on 
+            your gap analysis, then run another PSA analysis to start tracking your progress!
+            
+            **Your Baseline Metrics:**
+            """)
+            
+            # Show baseline metrics
+            baseline = history[0]
+            col1, col2, col3, col4 = st.columns(4)
+            
+            with col1:
+                st.metric("Overall Score", f"{baseline['overall_score']:.1f}%")
+            with col2:
+                st.metric("Trust Score", f"{baseline['trust_score']:.1f}%")
+            with col3:
+                st.metric("Visibility Score", f"{baseline['visibility_score']:.1f}%")
+            with col4:
+                st.metric("Total Gaps", baseline['total_gaps'])
+                
+        else:
+            # Full progress tracking dashboard
+            st.markdown("### 🎯 Your Optimization Journey")
+            
+            # Progress overview
+            latest = history[-1]
+            baseline = history[0]
+            
+            col1, col2, col3, col4 = st.columns(4)
+            
+            overall_improvement = latest['overall_score'] - baseline['overall_score']
+            trust_improvement = latest['trust_score'] - baseline['trust_score']
+            visibility_improvement = latest['visibility_score'] - baseline['visibility_score']
+            gap_reduction = baseline['total_gaps'] - latest['total_gaps']
+            
+            with col1:
+                st.metric(
+                    "Overall Score", 
+                    f"{latest['overall_score']:.1f}%",
+                    delta=f"{overall_improvement:+.1f}%",
+                    help="Change since your first analysis"
+                )
+            with col2:
+                st.metric(
+                    "Trust Score", 
+                    f"{latest['trust_score']:.1f}%",
+                    delta=f"{trust_improvement:+.1f}%",
+                    help="Change in critical domain performance"
+                )
+            with col3:
+                st.metric(
+                    "Visibility Score", 
+                    f"{latest['visibility_score']:.1f}%",
+                    delta=f"{visibility_improvement:+.1f}%",
+                    help="Change in professional presence signals"
+                )
+            with col4:
+                st.metric(
+                    "Gaps Closed", 
+                    f"{gap_reduction}",
+                    delta=f"{gap_reduction} fewer gaps",
+                    help="Reduction in missing keywords"
+                )
+            
+            # Progress chart
+            st.markdown("### 📈 Score Trends Over Time")
+            progress_fig = create_progress_chart(history)
+            if progress_fig:
+                st.plotly_chart(progress_fig, use_container_width=True)
+            
+            # Domain improvement analysis
+            if len(history) >= 2:
+                st.markdown("### 🔄 Domain Improvements Since Last Analysis")
+                domain_fig = create_domain_comparison_chart(results, history)
+                if domain_fig:
+                    st.plotly_chart(domain_fig, use_container_width=True)
+                
+                # Improvement insights
+                current_domains = results.get('domain_scores', {})
+                previous_domains = history[-2]['domain_scores']
+                
+                improved_domains = []
+                declined_domains = []
+                
+                for domain in current_domains:
+                    current_score = current_domains.get(domain, 0)
+                    previous_score = previous_domains.get(domain, 0)
+                    change = current_score - previous_score
+                    
+                    if change > 2:  # Improvement threshold
+                        improved_domains.append((domain, change))
+                    elif change < -2:  # Decline threshold
+                        declined_domains.append((domain, change))
+                
+                if improved_domains:
+                    st.success("🎉 **Domains with Notable Improvement:**")
+                    for domain, change in sorted(improved_domains, key=lambda x: x[1], reverse=True):
+                        st.write(f"• **{domain}**: +{change:.1f}%")
+                
+                if declined_domains:
+                    st.warning("⚠️ **Domains Needing Attention:**")
+                    for domain, change in sorted(declined_domains, key=lambda x: x[1]):
+                        st.write(f"• **{domain}**: {change:.1f}%")
+                
+                if not improved_domains and not declined_domains:
+                    st.info("📊 **Stable Performance** - Scores remained consistent across domains")
+            
+            # Analysis history table
+            if st.expander("📜 View Analysis History", expanded=False):
+                history_df = pd.DataFrame(history)
+                history_df['Date'] = history_df['timestamp'].dt.strftime('%Y-%m-%d %H:%M')
+                history_df = history_df[['Date', 'overall_score', 'trust_score', 'visibility_score', 'total_gaps', 'predicted_soc_group']]
+                history_df.columns = ['Date', 'Overall %', 'Trust %', 'Visibility %', 'Total Gaps', 'Predicted Role']
+                
+                st.dataframe(history_df, use_container_width=True)
+                
+            # Clear history option
+            if st.button("🗑️ Clear Analysis History", 
+                        help="Remove all stored analysis history (cannot be undone)"):
+                if st.button("⚠️ Confirm Clear History", type="secondary"):
+                    st.session_state.analysis_history = []
+                    st.success("✅ Analysis history cleared!")
+                    st.experimental_rerun()
 
     with tabs[4]:  # Advanced Insights
         st.header("📈 Advanced Analytics & Insights", help="Deep dive into your profile's competitive positioning, optimization potential, and strategic recommendations")
