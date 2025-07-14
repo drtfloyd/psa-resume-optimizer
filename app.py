@@ -1007,19 +1007,91 @@ else:
         if not results:
             st.info("Upload your resume and job description to get started.")
         else:
-            col1, col2, col3 = st.columns(3)
-            col1.metric("Overall Match", f"{results.get('overall_score', 0)}%")
-            col2.metric("Trust Score", f"{results.get('trust_score', 0)}%")
-            col3.metric("Visibility Score", f"{results.get('visibility_score', 0)}%")
+            # --- METRIC DISPLAY (4 COLUMNS) ---
+            st.markdown("#### Key Metrics")
+            col1, col2, col3, col4 = st.columns(4)
+            overall_score = results.get('overall_score', 0)
+            trust_score, visibility_score = calculate_trust_visibility_scores(results)
+            domain_gaps = results.get("domain_gaps", {})
+            improvement_areas = len(domain_gaps)
 
-            st.markdown("### Skill Domain Alignment")
+            with col1:
+                st.metric("Overall Match", f"{overall_score:.1f}%", help="Resume alignment with job description")
+            with col2:
+                st.metric("Trust Score", f"{trust_score:.1f}%", help="Strength of critical skill signals")
+            with col3:
+                st.metric("Visibility Score", f"{visibility_score:.1f}%", help="Breadth of professional presence signals")
+            with col4:
+                st.metric("Improvement Areas", improvement_areas, help="Domains with skill gaps to address")
+
+            # --- OVERALL RESUME ALIGNMENT PROGRESS BAR ---
+            st.markdown("#### Overall Resume Alignment")
+            st.progress(min(overall_score / 100, 1.0))
+            if overall_score >= 80:
+                st.success("Excellent alignment with the target role!")
+            elif overall_score >= 60:
+                st.info("Good match, but some areas for improvement.")
+            else:
+                st.warning("Significant gaps detected. Review the recommendations below.")
+
+            # --- JOB CATEGORY ANALYSIS ---
+            st.markdown("#### Job Category Analysis")
+            soc_group = results.get('predicted_soc_group', 'Unknown')
+            soc_scores = results.get('soc_scores', {})
+            suggested_titles = results.get("suggested_titles", [])
+            st.write(f"**Predicted SOC Group:** {soc_group}")
+
+            # Show confidence scores for top 3 SOC groups
+            if soc_scores and len(soc_scores) > 1:
+                top_socs = sorted(soc_scores.items(), key=lambda x: x[1], reverse=True)[:3]
+                soc_cols = st.columns(len(top_socs))
+                for i, (soc, score) in enumerate(top_socs):
+                    with soc_cols[i]:
+                        if soc == soc_group:
+                            st.markdown(f"**{soc}** ✓")
+                        else:
+                            st.markdown(soc)
+                        st.progress(int(score))
+                        st.caption(f"{score:.1f}%")
+
+            # Show suggested job titles if available
+            if suggested_titles:
+                st.markdown("**Recommended Job Titles:**")
+                st.write(", ".join(suggested_titles[:4]))
+
+            # --- SIGNAL DOMAIN PERFORMANCE ---
+            st.markdown("#### Signal Domain Performance")
             domain_scores = results.get("domain_scores", {})
             critical_domains = set(results.get("critical_domains", []))
-
-            for domain, score in sorted(domain_scores.items(), key=lambda x: -x[1]):
+            domain_gaps = results.get("domain_gaps", {})
+            # Sort: critical domains first, then by score descending
+            sorted_domains = sorted(domain_scores.items(), key=lambda x: (x[0] not in critical_domains, -x[1]))
+            for domain, score in sorted_domains:
+                is_critical = domain in critical_domains
+                # Progress bar color logic
+                if score >= 80:
+                    bar_color = "green"
+                elif score >= 60:
+                    bar_color = "blue"
+                elif is_critical:
+                    bar_color = "red"
+                else:
+                    bar_color = "orange"
+                # Progress bar (simulate color via markdown, as st.progress is not color-customizable)
                 bar = st.progress(score / 100)
-                label = f"🔥 {domain}" if domain in critical_domains else f"{domain}"
-                st.write(f"**{label}**: {score}%")
+                label = f"🔥 **{domain}**" if is_critical else f"{domain}"
+                # Conditional styling for critical domains
+                if is_critical:
+                    st.markdown(f"{label}: <span style='color:#e74c3c'><b>{score:.1f}%</b></span>", unsafe_allow_html=True)
+                else:
+                    st.markdown(f"{label}: <span style='color:#2980b9'>{score:.1f}%</span>", unsafe_allow_html=True)
+                # Show improvement cues
+                if is_critical and score < 60:
+                    st.warning(f"⚠️ Critical domain '{domain}' needs attention!")
+                # Show missing keywords for this domain (top 3)
+                domain_missing = domain_gaps.get(domain, [])
+                if domain_missing:
+                    st.caption(f"Missing keywords: {', '.join(domain_missing[:3])}")
 
     with tabs[1]:  # Gap Analysis
         st.header("🔍 Strategic Keyword Gap Analysis", help="Pinpoint missing keywords across key skill domains")
