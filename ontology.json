@@ -45,6 +45,7 @@
     "Business and Financial Operations Occupations": {
       "example_titles": ["Accountants", "Financial Analysts", "HR Specialists"],
       "signal_domains": ["Data & Evidence", "Risk & Compliance", "Systems & Structure"]
+    },
     "Computer and Mathematical Occupations": {
   "example_titles": ["Software Developers", "Data Scientists", "Statisticians"],
   "signal_domains": [
@@ -127,7 +128,8 @@
       "signal_domains": ["Adaptation & Flexibility", "Systems & Structure"]
     },
    "Community and Social Service Occupations": {
-  "example_domains": ["Social Workers", "Counselors", "Religious Workers"],      
+  "example_titles": ["Social Workers", "Counselors", "Religious Workers"],  
+  "signal_domains": ["Equity & Inclusion", "Presence & Identity", "Collaboration & Relational Work"]
     },
     "Military Specific Occupations": {
       "example_titles": ["Enlisted Military", "Officer Military Roles"],
