@@ -36,10 +36,12 @@ def calculate_trust_visibility_scores(results: Dict) -> Tuple[float, float]:
     domain_gaps = results.get("domain_gaps", {})
 
     # Calculate trust score (average of critical domain scores)
-    trust_scores = [score for domain, score in domain_scores.items() 
-                   if domain in critical_domains]
-    trust_score = sum(trust_scores) / len(trust_scores) if trust_scores else 0
-
+   trust_scores = sorted(
+    [score for domain, score in domain_scores.items() if domain in critical_domains],
+    reverse=True
+)[:5]
+trust_score = sum(trust_scores) / len(trust_scores) if trust_scores else 0
+  
     # Calculate visibility score (domains with good coverage)
     if domain_gaps:
         visibility_hits = sum(1 for domain in domain_gaps 
@@ -358,7 +360,9 @@ def run_ontological_analysis(resume_file, jd_file, ontology: Dict, soc_override:
             # Deprioritize any match where fewer than 2 signal domains were triggered
             elif triggered_domains < 2:
                 score *= 0.6  # reduce confidence by 40%
-
+            if score < 25:
+                score = 0
+                
             soc_scores[group_name] = score
             if score > max_soc_score:
                 max_soc_score, best_soc_group = score, group_name
