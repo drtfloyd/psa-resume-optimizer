@@ -16,11 +16,7 @@ from collections import defaultdict
 from typing import Dict, Set, List, Tuple, Optional
 from datetime import datetime
 import base64
-from reportlab.lib.pagesizes import letter
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
-from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-from reportlab.lib.units import inch
-from reportlab.lib import colors
+from fpdf import FPDF
 import pandas as pd
 
 import plotly.graph_objects as go
@@ -120,137 +116,24 @@ def generate_hyperprompt(results: Dict) -> str:
 
     return " ".join(prompt_parts)
 
-def generate_pdf_report(results: Dict) -> bytes:
-    """
-    Generate a comprehensive PDF report of the PSA analysis.
-    
-    Args:
-        results: Analysis results dictionary
-        
-    Returns:
-        bytes: PDF file content
-    """
-    buffer = io.BytesIO()
-    doc = SimpleDocTemplate(buffer, pagesize=letter, topMargin=0.5*inch)
-    styles = getSampleStyleSheet()
-    story = []
-    
-    # Custom styles
-    title_style = ParagraphStyle(
-        'CustomTitle',
-        parent=styles['Heading1'],
-        fontSize=24,
-        textColor=colors.HexColor('#2c3e50'),
-        spaceAfter=30,
-        alignment=1  # Center
-    )
-    
-    header_style = ParagraphStyle(
-        'CustomHeader',
-        parent=styles['Heading2'],
-        fontSize=16,
-        textColor=colors.HexColor('#3498db'),
-        spaceAfter=12
-    )
-    
-    # Title
-    story.append(Paragraph("PSA™ Resume Analysis Report", title_style))
-    story.append(Paragraph(f"Generated on {datetime.now().strftime('%B %d, %Y at %I:%M %p')}", styles['Normal']))
-    story.append(Spacer(1, 20))
-    
-    # Executive Summary
-    story.append(Paragraph("Executive Summary", header_style))
-    
-    overall_score = results.get('overall_score', 0)
-    trust_score, visibility_score = calculate_trust_visibility_scores(results)
-    soc_group = results.get('predicted_soc_group', 'Unknown')
-    
-    summary_data = [
-        ['Metric', 'Score', 'Status'],
-        ['Overall Match', f"{overall_score:.1f}%", 'Excellent' if overall_score >= 80 else 'Good' if overall_score >= 60 else 'Needs Work'],
-        ['Trust Score', f"{trust_score:.1f}%", 'Strong' if trust_score >= 70 else 'Moderate' if trust_score >= 40 else 'Developing'],
-        ['Visibility Score', f"{visibility_score:.1f}%", 'Clear' if visibility_score >= 70 else 'Moderate' if visibility_score >= 40 else 'Emerging'],
-        ['Predicted Role', soc_group, 'Best Match']
-    ]
-    
-    summary_table = Table(summary_data, colWidths=[2*inch, 1*inch, 1.5*inch])
-    summary_table.setStyle(TableStyle([
-        ('BACKGROUND', (0,0), (-1,0), colors.HexColor('#3498db')),
-        ('TEXTCOLOR', (0,0), (-1,0), colors.whitesmoke),
-        ('ALIGN', (0,0), (-1,-1), 'CENTER'),
-        ('FONTNAME', (0,0), (-1,0), 'Helvetica-Bold'),
-        ('FONTSIZE', (0,0), (-1,0), 12),
-        ('BOTTOMPADDING', (0,0), (-1,0), 12),
-        ('BACKGROUND', (0,1), (-1,-1), colors.beige),
-        ('GRID', (0,0), (-1,-1), 1, colors.black)
-    ]))
-    
-    story.append(summary_table)
-    story.append(Spacer(1, 20))
-    
-    # Domain Performance
-    story.append(Paragraph("Domain Performance Analysis", header_style))
-    
-    domain_scores = results.get('domain_scores', {})
-    critical_domains = set(results.get('critical_domains', []))
-    
-    if domain_scores:
-        domain_data = [['Domain', 'Score', 'Critical', 'Recommendation']]
-        for domain, score in sorted(domain_scores.items(), key=lambda x: x[1], reverse=True):
-            is_critical = domain in critical_domains
-            recommendation = 'Excellent' if score >= 80 else 'Strong' if score >= 60 else 'Needs Development'
-            domain_data.append([
-                domain,
-                f"{score:.1f}%",
-                'Yes' if is_critical else 'No',
-                recommendation
-            ])
-        
-        domain_table = Table(domain_data, colWidths=[2.5*inch, 1*inch, 0.8*inch, 1.2*inch])
-        domain_table.setStyle(TableStyle([
-            ('BACKGROUND', (0,0), (-1,0), colors.HexColor('#2c3e50')),
-            ('TEXTCOLOR', (0,0), (-1,0), colors.whitesmoke),
-            ('ALIGN', (0,0), (-1,-1), 'CENTER'),
-            ('FONTNAME', (0,0), (-1,0), 'Helvetica-Bold'),
-            ('FONTSIZE', (0,0), (-1,0), 10),
-            ('BOTTOMPADDING', (0,0), (-1,0), 12),
-            ('BACKGROUND', (0,1), (-1,-1), colors.lightgrey),
-            ('GRID', (0,0), (-1,-1), 1, colors.black),
-            ('FONTSIZE', (0,1), (-1,-1), 9)
-        ]))
-        
-        story.append(domain_table)
-        story.append(Spacer(1, 20))
-    
-    # Key Recommendations
-    story.append(Paragraph("Strategic Recommendations", header_style))
-    
-    domain_gaps = results.get('domain_gaps', {})
-    recommendations = []
-    
-    # Get top recommendations
-    for domain in critical_domains:
-        if domain in domain_gaps and len(domain_gaps[domain]) > 0:
-            top_gaps = domain_gaps[domain][:3]
-            recommendations.append(f"Strengthen {domain}: Add keywords like {', '.join(top_gaps)}")
-    
-    if not recommendations:
-        recommendations = ["Excellent alignment! Continue leveraging your strong skill profile."]
-    
-    for i, rec in enumerate(recommendations[:5], 1):
-        story.append(Paragraph(f"{i}. {rec}", styles['Normal']))
-        story.append(Spacer(1, 6))
-    
-    story.append(Spacer(1, 20))
-    
-    # Footer
-    story.append(Paragraph("This analysis was generated by PSA™ (Presence Signaling Architecture)", styles['Normal']))
-    story.append(Paragraph("Powered by AIaPI™ Framework | © 2024 All Rights Reserved", styles['Normal']))
-    
-    # Build PDF
-    doc.build(story)
-    buffer.seek(0)
-    return buffer.getvalue()
+def generate_pdf_report(results: dict) -> bytes:
+    pdf = FPDF()
+    pdf.add_page()
+    pdf.set_font("Arial", size=12)
+    pdf.set_auto_page_break(auto=True, margin=15)
+
+    pdf.set_font("Arial", 'B', size=14)
+    pdf.cell(0, 10, "PSA™ Resume Gap Analysis Report", ln=True)
+
+    domain_gaps = results.get("domain_gaps", {})
+    for domain, gaps in domain_gaps.items():
+        pdf.set_font("Arial", 'B', size=12)
+        pdf.cell(0, 10, f"\n{domain}", ln=True)
+        pdf.set_font("Arial", size=12)
+        for kw in gaps:
+            pdf.cell(0, 10, f" - {kw}", ln=True)
+
+    return pdf.output(dest='S').encode('latin-1')
 
 def save_analysis_to_history(results: Dict):
     """Save current analysis to session history for progress tracking."""
@@ -852,25 +735,13 @@ with st.sidebar:
         st.markdown("---")
         colpdf1, colpdf2, colpdf3 = st.columns([1, 2, 1])
         with colpdf2:
-            if st.button("📄 Download Analysis Report", 
-                        use_container_width=True, 
-                        type="secondary",
-                        help="Generate and download a comprehensive PDF report of your PSA analysis"):
-                try:
-                    with st.spinner("Generating your personalized PSA report..."):
-                        pdf_bytes = generate_pdf_report(results)
-                        # Create download button
-                        st.download_button(
-                            label="📥 Download PDF Report",
-                            data=pdf_bytes,
-                            file_name=f"PSA_Analysis_Report_{datetime.now().strftime('%Y%m%d_%H%M')}.pdf",
-                            mime="application/pdf",
-                            use_container_width=True,
-                            help="Click to save your comprehensive PSA analysis report"
-                        )
-                        st.success("✅ Report generated successfully!")
-                except Exception as e:
-                    st.error(f"⚠️ Error generating PDF report: {str(e)}")
+            if st.button("📄 Download Analysis Report"):
+                if 'analysis_results' in st.session_state and st.session_state.analysis_results:
+                    results = st.session_state.analysis_results
+                    pdf_bytes = generate_pdf_report(results)
+                    st.download_button("Download PDF", data=pdf_bytes, file_name="psa_resume_analysis.pdf", mime="application/pdf")
+                else:
+                    st.error("⚠️ Error generating PDF report: no analysis results available.")
                     st.info("💡 Tip: Try refreshing the page and running the analysis again.")
         st.markdown("---")
 
