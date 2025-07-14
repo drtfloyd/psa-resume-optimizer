@@ -1099,43 +1099,21 @@ else:
         if not results:
             st.warning("Run an analysis to view your keyword gaps.")
         else:
-            st.markdown("The table below shows skill keywords grouped by domain. Keywords **not found** in your resume but present in the job description are marked in red.")
+            st.markdown("Below are the skill keywords grouped by domain. Keywords **not found** in your resume but present in the job description are listed in red.")
 
-            from itertools import zip_longest
-
-            # --- Begin Original Gap Analysis Module ---
-            # To use the original logic, we need domain_keywords and resume_keywords.
-            # We'll reconstruct them as best as possible from the available results.
-            # For demonstration, we'll do a best-effort approximation.
-            # If you want full fidelity, pass these in run_enhanced_ontological_analysis.
-
-            # Try to reconstruct domain_keywords and resume_keywords
-            # We'll use domain_gaps for missing, and for present we'll simulate as empty for now.
-            # This preserves the original table structure.
+            # --- Restored Original Keyword Gap Analysis Logic ---
             domain_gaps = results.get("domain_gaps", {})
-            domain_scores = results.get("domain_scores", {})
-            critical_domains = set(results.get("critical_domains", []))
-
-            # For demonstration, treat all missing terms as those in domain_gaps, and show them in red.
-            # No information on matched terms, so only missing are shown.
             for domain, jd_terms in domain_gaps.items():
                 resume_terms = []  # No info, so empty
                 missing_terms = list(jd_terms)
 
-                if len(jd_terms) == 0:
+                if not jd_terms:
                     continue
 
                 st.markdown(f"#### 📂 {domain}")
-                table = []
-                for rt, jt in zip_longest(resume_terms, jd_terms):
-                    row = [
-                        f"✅ {rt}" if rt in resume_terms else "",
-                        f"🟥 {jt}" if jt in missing_terms else f"{jt}"
-                    ]
-                    table.append(row)
-
-                st.table(table)
-            # --- End Original Gap Analysis Module ---
+                for term in missing_terms:
+                    st.markdown(f"- 🟥 **{term}**")
+            # --- End Original Keyword Gap Analysis Logic ---
 
     with tabs[2]:  # Career Paths
         st.header("💼 Career Path Recommendations", help="Suggested career trajectories and job titles based on your skill profile and domain strengths")
@@ -1192,12 +1170,11 @@ else:
         Use this customized prompt with ChatGPT, Claude, or any AI assistant to optimize your resume. The prompt is specifically tailored to your gap analysis results.
         """)
 
-        if "results" in st.session_state:
-            results = st.session_state["results"]
+        if not results or "domain_gaps" not in results:
+            st.warning("Run a resume + job description analysis first.")
+        else:
             hyper_prompt = generate_hyperprompt(results)
             st.text_area("🎯 Optimization Prompt", hyper_prompt, height=400)
-        else:
-            st.warning("Run a resume + job description analysis first.")
 
     with tabs[5]:  # Progress Tracking
         st.header("📋 Progress Tracking", help="Track your resume optimization journey over time with detailed analytics and improvement insights")
