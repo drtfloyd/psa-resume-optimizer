@@ -117,82 +117,44 @@ def generate_hyperprompt(results: Dict) -> str:
     return " ".join(prompt_parts)
 
 def generate_pdf_report(results: dict) -> bytes:
-    """Generate PDF report and return as bytes for download."""
-    try:
-        pdf = FPDF()
-        pdf.add_page()
-        pdf.set_auto_page_break(auto=True, margin=15)
-        
-        # Use Arial font (always available)
-        pdf.set_font("Arial", 'B', size=16)
-        pdf.cell(0, 10, "PSA Resume Gap Analysis Report", ln=True)
+    """Generate PDF report - simplified for debugging."""
+    pdf = FPDF()
+    pdf.add_page()
+    pdf.set_font("Arial", size=12)
+    
+    # Just basic content to test
+    pdf.cell(0, 10, "PSA Resume Analysis Report", ln=True)
+    pdf.ln(5)
+    
+    # Add basic metrics
+    overall_score = results.get('overall_score', 0)
+    pdf.cell(0, 8, f"Overall Score: {overall_score:.1f}%", ln=True)
+    
+    # Try to add domain gaps with safety checks
+    domain_gaps = results.get('domain_gaps', {})
+    if domain_gaps:
         pdf.ln(5)
-
-        # Add summary section
-        pdf.set_font("Arial", 'B', size=12)
-        pdf.cell(0, 10, "Analysis Summary", ln=True)
-        pdf.set_font("Arial", '', size=10)
+        pdf.cell(0, 8, "Top Missing Keywords:", ln=True)
         
-        # Add key metrics
-        overall_score = results.get('overall_score', 0)
-        soc_group = results.get('predicted_soc_group', 'Unknown')
-        total_gaps = sum(len(gaps) for gaps in results.get('domain_gaps', {}).values())
-        
-        pdf.cell(0, 8, f"Overall Match Score: {overall_score:.1f}%", ln=True)
-        pdf.cell(0, 8, f"Predicted Job Category: {soc_group}", ln=True)
-        pdf.cell(0, 8, f"Total Keywords to Add: {total_gaps}", ln=True)
-        pdf.ln(8)
-
-        # Domain gaps section
-        pdf.set_font("Arial", 'B', size=12)
-        pdf.cell(0, 10, "Missing Keywords by Domain", ln=True)
-        
-        domain_gaps = results.get("domain_gaps", {})
+        count = 0
         for domain, gaps in domain_gaps.items():
-            if not gaps:
-                continue
-                
-            pdf.set_font('Arial', 'B', size=11)
-            pdf.cell(0, 8, f"{domain}", ln=True)
-            pdf.set_font('Arial', '', size=9)
-                
-            for kw in gaps[:10]:  # Limit to top 10
-                # Clean text for PDF compatibility
-                clean_kw = kw.encode('latin-1', 'replace').decode('latin-1')
-                pdf.cell(0, 6, f"    • {clean_kw}", ln=True)
-            
-            if len(gaps) > 10:
-                pdf.cell(0, 6, f"    ... and {len(gaps) - 10} more", ln=True)
-            pdf.ln(3)
-
-        # FIXED: Handle bytearray return from FPDF
-        pdf_output = pdf.output(dest='S')
-        
-        # Convert to bytes regardless of what FPDF returns
-        if isinstance(pdf_output, str):
-            return pdf_output.encode('latin-1')
-        elif isinstance(pdf_output, bytearray):
-            return bytes(pdf_output)  # Convert bytearray to bytes
-        else:
-            return pdf_output  # Already bytes
-            
-    except Exception:
-        # Fallback minimal PDF
-        pdf = FPDF()
-        pdf.add_page()
-        pdf.set_font("Arial", 'B', size=14)
-        pdf.cell(0, 10, "PSA Resume Analysis Report", ln=True)
-        pdf.set_font("Arial", '', size=10)
-        pdf.cell(0, 8, "Error generating detailed report. Please try again.", ln=True)
-        
-        pdf_output = pdf.output(dest='S')
-        # Convert to bytes regardless of what FPDF returns
-        if isinstance(pdf_output, str):
-            return pdf_output.encode('latin-1')
-        elif isinstance(pdf_output, bytearray):
-            return bytes(pdf_output)  # Convert bytearray to bytes
-        else:
-            return pdf_output  # Already bytes
+            if count >= 5:  # Limit output
+                break
+            for gap in gaps[:3]:  # Top 3 per domain
+                # Clean the text aggressively
+                clean_gap = ''.join(c for c in str(gap) if ord(c) < 128)
+                if clean_gap:
+                    pdf.cell(0, 6, f"  {clean_gap}", ln=True)
+                    count += 1
+                    if count >= 10:
+                        break
+    
+    # Return as bytes
+    pdf_output = pdf.output(dest='S')
+    if isinstance(pdf_output, (bytes, bytearray)):
+        return bytes(pdf_output)
+    else:
+        return pdf_output.encode('latin-1')
 
 def save_analysis_to_history(results: Dict):
     """Save current analysis to session history for progress tracking."""
