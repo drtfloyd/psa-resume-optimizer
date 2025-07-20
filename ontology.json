@@ -1,0 +1,423 @@
+{
+  "SignalDomains": {
+    "Presence & Identity": [
+      "presence",
+      "voice",
+      "visibility",
+      "identity",
+      "stance",
+      "authenticity",
+      "reputation",
+      "persona",
+      "recognition",
+      "name"
+    ],
+    "Communication Strategy": [
+      "signal",
+      "transmit",
+      "encode",
+      "resonance",
+      "map",
+      "message",
+      "tone",
+      "framing",
+      "narrative",
+      "audience"
+    ],
+    "Learning & Instruction": [
+      "curriculum",
+      "teaching",
+      "instructional design",
+      "scaffold",
+      "assessment",
+      "learning outcomes",
+      "pedagogy",
+      "competency",
+      "formative",
+      "engagement"
+    ],
+    "Leadership & Influence": [
+      "leadership",
+      "coaching",
+      "influence",
+      "vision",
+      "strategy",
+      "mentorship",
+      "decision-making",
+      "initiative",
+      "credibility",
+      "alignment"
+    ],
+    "Outcomes & Impact": [
+      "impact",
+      "result",
+      "deliverable",
+      "transformation",
+      "metric",
+      "value",
+      "evidence of change",
+      "ROI",
+      "growth",
+      "effectiveness"
+    ],
+    "Collaboration & Relational Work": [
+      "teamwork",
+      "collaboration",
+      "relationship",
+      "partnership",
+      "network",
+      "trust",
+      "coordination",
+      "shared goals",
+      "communication",
+      "support"
+    ],
+    "Systems & Structure": [
+      "workflow",
+      "process",
+      "infrastructure",
+      "architecture",
+      "governance",
+      "standards",
+      "interoperability",
+      "system design",
+      "platform",
+      "protocol"
+    ],
+    "Adaptation & Flexibility": [
+      "resilience",
+      "agility",
+      "change",
+      "pivot",
+      "adapt",
+      "flexibility",
+      "iteration",
+      "response",
+      "readiness",
+      "navigation"
+    ],
+    "Equity & Inclusion": [
+      "equity",
+      "diversity",
+      "inclusion",
+      "access",
+      "justice",
+      "representation",
+      "fairness",
+      "belonging",
+      "accessibility",
+      "anti-bias"
+    ],
+    "Risk & Compliance": [
+      "risk",
+      "compliance",
+      "regulation",
+      "audit",
+      "policy",
+      "safety",
+      "liability",
+      "control",
+      "protocol",
+      "ethics"
+    ],
+    "Data & Evidence": [
+      "data",
+      "evidence",
+      "research",
+      "evaluation",
+      "insight",
+      "measurement",
+      "analytics",
+      "observation",
+      "indicators",
+      "outcomes"
+    ],
+    "AI & Technical Literacy": [
+      "AI",
+      "machine learning",
+      "automation",
+      "digital fluency",
+      "tools",
+      "algorithms",
+      "prompting",
+      "data modeling",
+      "tech stack",
+      "interface"
+    ]
+  },
+  "SOC_Groups": {
+    "Management Occupations": {
+      "examples": [
+        "Executives",
+        "Operations Managers",
+        "Education Administrators"
+      ],
+      "signal_domains": [
+        "Leadership & Influence",
+        "Systems & Structure",
+        "Outcomes & Impact"
+      ]
+    },
+    "Business and Financial Operations Occupations": {
+      "examples": [
+        "Accountants",
+        "Financial Analysts",
+        "HR Specialists"
+      ],
+      "signal_domains": [
+        "Data & Evidence",
+        "Risk & Compliance",
+        "Systems & Structure"
+      ]
+    },
+    "Computer and Mathematical Occupations": {
+      "examples": [
+        "Software Developers",
+        "Data Scientists",
+        "Statisticians"
+      ],
+      "signal_domains": [
+        "AI & Technical Literacy",
+        "Systems & Structure",
+        "Data & Evidence"
+      ]
+    },
+    "Architecture and Engineering Occupations": {
+      "examples": [
+        "Civil Engineers",
+        "Architects",
+        "Mechanical Engineers"
+      ],
+      "signal_domains": [
+        "Systems & Structure",
+        "Outcomes & Impact",
+        "AI & Technical Literacy"
+      ]
+    },
+    "Life, Physical, and Social Science Occupations": {
+      "examples": [
+        "Biologists",
+        "Chemists",
+        "Psychologists",
+        "Sociologists"
+      ],
+      "signal_domains": [
+        "Data & Evidence",
+        "Learning & Instruction",
+        "Equity & Inclusion"
+      ]
+    },
+    "Legal Occupations": {
+      "examples": [
+        "Lawyers",
+        "Paralegals",
+        "Judges"
+      ],
+      "signal_domains": [
+        "Risk & Compliance",
+        "Communication Strategy",
+        "Leadership & Influence"
+      ]
+    },
+    "Education, Training, and Library Occupations": {
+      "examples": [
+        "Teachers",
+        "Instructional Designers",
+        "Librarians"
+      ],
+      "signal_domains": [
+        "Learning & Instruction",
+        "Communication Strategy",
+        "Equity & Inclusion"
+      ]
+    },
+    "Healthcare Practitioners and Technical Occupations": {
+      "examples": [
+        "Nurses",
+        "Physicians",
+        "Pharmacists"
+      ],
+      "signal_domains": [
+        "Outcomes & Impact",
+        "Risk & Compliance",
+        "Collaboration & Relational Work"
+      ]
+    },
+    "Healthcare Support Occupations": {
+      "examples": [
+        "Home Health Aides",
+        "Medical Assistants",
+        "Dental Assistants"
+      ],
+      "signal_domains": [
+        "Equity & Inclusion",
+        "Collaboration & Relational Work",
+        "Adaptation & Flexibility"
+      ]
+    },
+    "Arts, Design, Entertainment, Sports, and Media Occupations": {
+      "examples": [
+        "Graphic Designers",
+        "Editors",
+        "Actors",
+        "Marketing Specialists"
+      ],
+      "signal_domains": [
+        "Communication Strategy",
+        "Presence & Identity",
+        "Learning & Instruction"
+      ]
+    },
+    "Protective Service Occupations": {
+      "examples": [
+        "Police Officers",
+        "Security Guards",
+        "Firefighters"
+      ],
+      "signal_domains": [
+        "Risk & Compliance",
+        "Leadership & Influence",
+        "Adaptation & Flexibility"
+      ]
+    },
+    "Food Preparation and Serving Related Occupations": {
+      "examples": [
+        "Cooks",
+        "Servers",
+        "Bartenders"
+      ],
+      "signal_domains": [
+        "Adaptation & Flexibility",
+        "Collaboration & Relational Work",
+        "Outcomes & Impact"
+      ]
+    },
+    "Building and Grounds Cleaning and Maintenance Occupations": {
+      "examples": [
+        "Janitors",
+        "Landscapers",
+        "Pest Control Workers"
+      ],
+      "signal_domains": [
+        "Systems & Structure",
+        "Adaptation & Flexibility"
+      ]
+    },
+    "Personal Care and Service Occupations": {
+      "examples": [
+        "Childcare Workers",
+        "Personal Care Aides",
+        "Hairstylists"
+      ],
+      "signal_domains": [
+        "Equity & Inclusion",
+        "Presence & Identity",
+        "Collaboration & Relational Work"
+      ]
+    },
+    "Sales and Related Occupations": {
+      "examples": [
+        "Retail Salespersons",
+        "Real Estate Agents",
+        "Sales Managers"
+      ],
+      "signal_domains": [
+        "Communication Strategy",
+        "Outcomes & Impact",
+        "Presence & Identity"
+      ]
+    },
+    "Office and Administrative Support Occupations": {
+      "examples": [
+        "Receptionists",
+        "Clerks",
+        "Customer Service Representatives"
+      ],
+      "signal_domains": [
+        "Systems & Structure",
+        "Communication Strategy",
+        "Risk & Compliance"
+      ]
+    },
+    "Farming, Fishing, and Forestry Occupations": {
+      "examples": [
+        "Agricultural Workers",
+        "Loggers",
+        "Fishers"
+      ],
+      "signal_domains": [
+        "Adaptation & Flexibility",
+        "Systems & Structure"
+      ]
+    },
+    "Construction and Extraction Occupations": {
+      "examples": [
+        "Electricians",
+        "Plumbers",
+        "Construction Laborers"
+      ],
+      "signal_domains": [
+        "Systems & Structure",
+        "Outcomes & Impact",
+        "Adaptation & Flexibility"
+      ]
+    },
+    "Installation, Maintenance, and Repair Occupations": {
+      "examples": [
+        "Mechanics",
+        "HVAC Technicians",
+        "Line Installers"
+      ],
+      "signal_domains": [
+        "AI & Technical Literacy",
+        "Systems & Structure",
+        "Outcomes & Impact"
+      ]
+    },
+    "Production Occupations": {
+      "examples": [
+        "Assemblers",
+        "Machinists",
+        "Bakers"
+      ],
+      "signal_domains": [
+        "Outcomes & Impact",
+        "Systems & Structure"
+      ]
+    },
+    "Transportation and Material Moving Occupations": {
+      "examples": [
+        "Truck Drivers",
+        "Delivery Workers",
+        "Forklift Operators"
+      ],
+      "signal_domains": [
+        "Adaptation & Flexibility",
+        "Systems & Structure"
+      ]
+    },
+    "Community and Social Service Occupations": {
+      "examples": [
+        "Social Workers",
+        "Counselors",
+        "Religious Workers"
+      ],
+      "signal_domains": [
+        "Equity & Inclusion",
+        "Presence & Identity",
+        "Collaboration & Relational Work"
+      ]
+    },
+    "Military Specific Occupations": {
+      "examples": [
+        "Enlisted Military",
+        "Officer Military Roles"
+      ],
+      "signal_domains": [
+        "Leadership & Influence",
+        "Risk & Compliance",
+        "Adaptation & Flexibility"
+      ]
+    }
+  }
+}

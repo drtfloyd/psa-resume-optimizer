@@ -1,0 +1,651 @@
+SOC Group,Domain,Keyword Phrase
+Management Occupations,Leadership & Influence,leadership
+Management Occupations,Leadership & Influence,coaching
+Management Occupations,Leadership & Influence,influence
+Management Occupations,Leadership & Influence,vision
+Management Occupations,Leadership & Influence,strategy
+Management Occupations,Leadership & Influence,mentorship
+Management Occupations,Leadership & Influence,decision-making
+Management Occupations,Leadership & Influence,initiative
+Management Occupations,Leadership & Influence,credibility
+Management Occupations,Leadership & Influence,alignment
+Management Occupations,Systems & Structure,workflow
+Management Occupations,Systems & Structure,process
+Management Occupations,Systems & Structure,infrastructure
+Management Occupations,Systems & Structure,architecture
+Management Occupations,Systems & Structure,governance
+Management Occupations,Systems & Structure,standards
+Management Occupations,Systems & Structure,interoperability
+Management Occupations,Systems & Structure,system design
+Management Occupations,Systems & Structure,platform
+Management Occupations,Systems & Structure,protocol
+Management Occupations,Outcomes & Impact,impact
+Management Occupations,Outcomes & Impact,result
+Management Occupations,Outcomes & Impact,deliverable
+Management Occupations,Outcomes & Impact,transformation
+Management Occupations,Outcomes & Impact,metric
+Management Occupations,Outcomes & Impact,value
+Management Occupations,Outcomes & Impact,evidence of change
+Management Occupations,Outcomes & Impact,ROI
+Management Occupations,Outcomes & Impact,growth
+Management Occupations,Outcomes & Impact,effectiveness
+Business and Financial Operations Occupations,Data & Evidence,data
+Business and Financial Operations Occupations,Data & Evidence,evidence
+Business and Financial Operations Occupations,Data & Evidence,research
+Business and Financial Operations Occupations,Data & Evidence,evaluation
+Business and Financial Operations Occupations,Data & Evidence,insight
+Business and Financial Operations Occupations,Data & Evidence,measurement
+Business and Financial Operations Occupations,Data & Evidence,analytics
+Business and Financial Operations Occupations,Data & Evidence,observation
+Business and Financial Operations Occupations,Data & Evidence,indicators
+Business and Financial Operations Occupations,Data & Evidence,outcomes
+Business and Financial Operations Occupations,Risk & Compliance,risk
+Business and Financial Operations Occupations,Risk & Compliance,compliance
+Business and Financial Operations Occupations,Risk & Compliance,regulation
+Business and Financial Operations Occupations,Risk & Compliance,audit
+Business and Financial Operations Occupations,Risk & Compliance,policy
+Business and Financial Operations Occupations,Risk & Compliance,safety
+Business and Financial Operations Occupations,Risk & Compliance,liability
+Business and Financial Operations Occupations,Risk & Compliance,control
+Business and Financial Operations Occupations,Risk & Compliance,protocol
+Business and Financial Operations Occupations,Risk & Compliance,ethics
+Business and Financial Operations Occupations,Systems & Structure,workflow
+Business and Financial Operations Occupations,Systems & Structure,process
+Business and Financial Operations Occupations,Systems & Structure,infrastructure
+Business and Financial Operations Occupations,Systems & Structure,architecture
+Business and Financial Operations Occupations,Systems & Structure,governance
+Business and Financial Operations Occupations,Systems & Structure,standards
+Business and Financial Operations Occupations,Systems & Structure,interoperability
+Business and Financial Operations Occupations,Systems & Structure,system design
+Business and Financial Operations Occupations,Systems & Structure,platform
+Business and Financial Operations Occupations,Systems & Structure,protocol
+Computer and Mathematical Occupations,AI & Technical Literacy,AI
+Computer and Mathematical Occupations,AI & Technical Literacy,machine learning
+Computer and Mathematical Occupations,AI & Technical Literacy,automation
+Computer and Mathematical Occupations,AI & Technical Literacy,digital fluency
+Computer and Mathematical Occupations,AI & Technical Literacy,tools
+Computer and Mathematical Occupations,AI & Technical Literacy,algorithms
+Computer and Mathematical Occupations,AI & Technical Literacy,prompting
+Computer and Mathematical Occupations,AI & Technical Literacy,data modeling
+Computer and Mathematical Occupations,AI & Technical Literacy,tech stack
+Computer and Mathematical Occupations,AI & Technical Literacy,interface
+Computer and Mathematical Occupations,Systems & Structure,workflow
+Computer and Mathematical Occupations,Systems & Structure,process
+Computer and Mathematical Occupations,Systems & Structure,infrastructure
+Computer and Mathematical Occupations,Systems & Structure,architecture
+Computer and Mathematical Occupations,Systems & Structure,governance
+Computer and Mathematical Occupations,Systems & Structure,standards
+Computer and Mathematical Occupations,Systems & Structure,interoperability
+Computer and Mathematical Occupations,Systems & Structure,system design
+Computer and Mathematical Occupations,Systems & Structure,platform
+Computer and Mathematical Occupations,Systems & Structure,protocol
+Computer and Mathematical Occupations,Data & Evidence,data
+Computer and Mathematical Occupations,Data & Evidence,evidence
+Computer and Mathematical Occupations,Data & Evidence,research
+Computer and Mathematical Occupations,Data & Evidence,evaluation
+Computer and Mathematical Occupations,Data & Evidence,insight
+Computer and Mathematical Occupations,Data & Evidence,measurement
+Computer and Mathematical Occupations,Data & Evidence,analytics
+Computer and Mathematical Occupations,Data & Evidence,observation
+Computer and Mathematical Occupations,Data & Evidence,indicators
+Computer and Mathematical Occupations,Data & Evidence,outcomes
+Architecture and Engineering Occupations,Systems & Structure,workflow
+Architecture and Engineering Occupations,Systems & Structure,process
+Architecture and Engineering Occupations,Systems & Structure,infrastructure
+Architecture and Engineering Occupations,Systems & Structure,architecture
+Architecture and Engineering Occupations,Systems & Structure,governance
+Architecture and Engineering Occupations,Systems & Structure,standards
+Architecture and Engineering Occupations,Systems & Structure,interoperability
+Architecture and Engineering Occupations,Systems & Structure,system design
+Architecture and Engineering Occupations,Systems & Structure,platform
+Architecture and Engineering Occupations,Systems & Structure,protocol
+Architecture and Engineering Occupations,Outcomes & Impact,impact
+Architecture and Engineering Occupations,Outcomes & Impact,result
+Architecture and Engineering Occupations,Outcomes & Impact,deliverable
+Architecture and Engineering Occupations,Outcomes & Impact,transformation
+Architecture and Engineering Occupations,Outcomes & Impact,metric
+Architecture and Engineering Occupations,Outcomes & Impact,value
+Architecture and Engineering Occupations,Outcomes & Impact,evidence of change
+Architecture and Engineering Occupations,Outcomes & Impact,ROI
+Architecture and Engineering Occupations,Outcomes & Impact,growth
+Architecture and Engineering Occupations,Outcomes & Impact,effectiveness
+Architecture and Engineering Occupations,AI & Technical Literacy,AI
+Architecture and Engineering Occupations,AI & Technical Literacy,machine learning
+Architecture and Engineering Occupations,AI & Technical Literacy,automation
+Architecture and Engineering Occupations,AI & Technical Literacy,digital fluency
+Architecture and Engineering Occupations,AI & Technical Literacy,tools
+Architecture and Engineering Occupations,AI & Technical Literacy,algorithms
+Architecture and Engineering Occupations,AI & Technical Literacy,prompting
+Architecture and Engineering Occupations,AI & Technical Literacy,data modeling
+Architecture and Engineering Occupations,AI & Technical Literacy,tech stack
+Architecture and Engineering Occupations,AI & Technical Literacy,interface
+"Life, Physical, and Social Science Occupations",Data & Evidence,data
+"Life, Physical, and Social Science Occupations",Data & Evidence,evidence
+"Life, Physical, and Social Science Occupations",Data & Evidence,research
+"Life, Physical, and Social Science Occupations",Data & Evidence,evaluation
+"Life, Physical, and Social Science Occupations",Data & Evidence,insight
+"Life, Physical, and Social Science Occupations",Data & Evidence,measurement
+"Life, Physical, and Social Science Occupations",Data & Evidence,analytics
+"Life, Physical, and Social Science Occupations",Data & Evidence,observation
+"Life, Physical, and Social Science Occupations",Data & Evidence,indicators
+"Life, Physical, and Social Science Occupations",Data & Evidence,outcomes
+"Life, Physical, and Social Science Occupations",Learning & Instruction,curriculum
+"Life, Physical, and Social Science Occupations",Learning & Instruction,teaching
+"Life, Physical, and Social Science Occupations",Learning & Instruction,instructional design
+"Life, Physical, and Social Science Occupations",Learning & Instruction,scaffold
+"Life, Physical, and Social Science Occupations",Learning & Instruction,assessment
+"Life, Physical, and Social Science Occupations",Learning & Instruction,learning outcomes
+"Life, Physical, and Social Science Occupations",Learning & Instruction,pedagogy
+"Life, Physical, and Social Science Occupations",Learning & Instruction,competency
+"Life, Physical, and Social Science Occupations",Learning & Instruction,formative
+"Life, Physical, and Social Science Occupations",Learning & Instruction,engagement
+"Life, Physical, and Social Science Occupations",Equity & Inclusion,equity
+"Life, Physical, and Social Science Occupations",Equity & Inclusion,diversity
+"Life, Physical, and Social Science Occupations",Equity & Inclusion,inclusion
+"Life, Physical, and Social Science Occupations",Equity & Inclusion,access
+"Life, Physical, and Social Science Occupations",Equity & Inclusion,justice
+"Life, Physical, and Social Science Occupations",Equity & Inclusion,representation
+"Life, Physical, and Social Science Occupations",Equity & Inclusion,fairness
+"Life, Physical, and Social Science Occupations",Equity & Inclusion,belonging
+"Life, Physical, and Social Science Occupations",Equity & Inclusion,accessibility
+"Life, Physical, and Social Science Occupations",Equity & Inclusion,anti-bias
+Legal Occupations,Risk & Compliance,risk
+Legal Occupations,Risk & Compliance,compliance
+Legal Occupations,Risk & Compliance,regulation
+Legal Occupations,Risk & Compliance,audit
+Legal Occupations,Risk & Compliance,policy
+Legal Occupations,Risk & Compliance,safety
+Legal Occupations,Risk & Compliance,liability
+Legal Occupations,Risk & Compliance,control
+Legal Occupations,Risk & Compliance,protocol
+Legal Occupations,Risk & Compliance,ethics
+Legal Occupations,Communication Strategy,signal
+Legal Occupations,Communication Strategy,transmit
+Legal Occupations,Communication Strategy,encode
+Legal Occupations,Communication Strategy,resonance
+Legal Occupations,Communication Strategy,map
+Legal Occupations,Communication Strategy,message
+Legal Occupations,Communication Strategy,tone
+Legal Occupations,Communication Strategy,framing
+Legal Occupations,Communication Strategy,narrative
+Legal Occupations,Communication Strategy,audience
+Legal Occupations,Leadership & Influence,leadership
+Legal Occupations,Leadership & Influence,coaching
+Legal Occupations,Leadership & Influence,influence
+Legal Occupations,Leadership & Influence,vision
+Legal Occupations,Leadership & Influence,strategy
+Legal Occupations,Leadership & Influence,mentorship
+Legal Occupations,Leadership & Influence,decision-making
+Legal Occupations,Leadership & Influence,initiative
+Legal Occupations,Leadership & Influence,credibility
+Legal Occupations,Leadership & Influence,alignment
+"Education, Training, and Library Occupations",Learning & Instruction,curriculum
+"Education, Training, and Library Occupations",Learning & Instruction,teaching
+"Education, Training, and Library Occupations",Learning & Instruction,instructional design
+"Education, Training, and Library Occupations",Learning & Instruction,scaffold
+"Education, Training, and Library Occupations",Learning & Instruction,assessment
+"Education, Training, and Library Occupations",Learning & Instruction,learning outcomes
+"Education, Training, and Library Occupations",Learning & Instruction,pedagogy
+"Education, Training, and Library Occupations",Learning & Instruction,competency
+"Education, Training, and Library Occupations",Learning & Instruction,formative
+"Education, Training, and Library Occupations",Learning & Instruction,engagement
+"Education, Training, and Library Occupations",Communication Strategy,signal
+"Education, Training, and Library Occupations",Communication Strategy,transmit
+"Education, Training, and Library Occupations",Communication Strategy,encode
+"Education, Training, and Library Occupations",Communication Strategy,resonance
+"Education, Training, and Library Occupations",Communication Strategy,map
+"Education, Training, and Library Occupations",Communication Strategy,message
+"Education, Training, and Library Occupations",Communication Strategy,tone
+"Education, Training, and Library Occupations",Communication Strategy,framing
+"Education, Training, and Library Occupations",Communication Strategy,narrative
+"Education, Training, and Library Occupations",Communication Strategy,audience
+"Education, Training, and Library Occupations",Equity & Inclusion,equity
+"Education, Training, and Library Occupations",Equity & Inclusion,diversity
+"Education, Training, and Library Occupations",Equity & Inclusion,inclusion
+"Education, Training, and Library Occupations",Equity & Inclusion,access
+"Education, Training, and Library Occupations",Equity & Inclusion,justice
+"Education, Training, and Library Occupations",Equity & Inclusion,representation
+"Education, Training, and Library Occupations",Equity & Inclusion,fairness
+"Education, Training, and Library Occupations",Equity & Inclusion,belonging
+"Education, Training, and Library Occupations",Equity & Inclusion,accessibility
+"Education, Training, and Library Occupations",Equity & Inclusion,anti-bias
+Healthcare Practitioners and Technical Occupations,Outcomes & Impact,impact
+Healthcare Practitioners and Technical Occupations,Outcomes & Impact,result
+Healthcare Practitioners and Technical Occupations,Outcomes & Impact,deliverable
+Healthcare Practitioners and Technical Occupations,Outcomes & Impact,transformation
+Healthcare Practitioners and Technical Occupations,Outcomes & Impact,metric
+Healthcare Practitioners and Technical Occupations,Outcomes & Impact,value
+Healthcare Practitioners and Technical Occupations,Outcomes & Impact,evidence of change
+Healthcare Practitioners and Technical Occupations,Outcomes & Impact,ROI
+Healthcare Practitioners and Technical Occupations,Outcomes & Impact,growth
+Healthcare Practitioners and Technical Occupations,Outcomes & Impact,effectiveness
+Healthcare Practitioners and Technical Occupations,Risk & Compliance,risk
+Healthcare Practitioners and Technical Occupations,Risk & Compliance,compliance
+Healthcare Practitioners and Technical Occupations,Risk & Compliance,regulation
+Healthcare Practitioners and Technical Occupations,Risk & Compliance,audit
+Healthcare Practitioners and Technical Occupations,Risk & Compliance,policy
+Healthcare Practitioners and Technical Occupations,Risk & Compliance,safety
+Healthcare Practitioners and Technical Occupations,Risk & Compliance,liability
+Healthcare Practitioners and Technical Occupations,Risk & Compliance,control
+Healthcare Practitioners and Technical Occupations,Risk & Compliance,protocol
+Healthcare Practitioners and Technical Occupations,Risk & Compliance,ethics
+Healthcare Practitioners and Technical Occupations,Collaboration & Relational Work,teamwork
+Healthcare Practitioners and Technical Occupations,Collaboration & Relational Work,collaboration
+Healthcare Practitioners and Technical Occupations,Collaboration & Relational Work,relationship
+Healthcare Practitioners and Technical Occupations,Collaboration & Relational Work,partnership
+Healthcare Practitioners and Technical Occupations,Collaboration & Relational Work,network
+Healthcare Practitioners and Technical Occupations,Collaboration & Relational Work,trust
+Healthcare Practitioners and Technical Occupations,Collaboration & Relational Work,coordination
+Healthcare Practitioners and Technical Occupations,Collaboration & Relational Work,shared goals
+Healthcare Practitioners and Technical Occupations,Collaboration & Relational Work,communication
+Healthcare Practitioners and Technical Occupations,Collaboration & Relational Work,support
+Healthcare Support Occupations,Equity & Inclusion,equity
+Healthcare Support Occupations,Equity & Inclusion,diversity
+Healthcare Support Occupations,Equity & Inclusion,inclusion
+Healthcare Support Occupations,Equity & Inclusion,access
+Healthcare Support Occupations,Equity & Inclusion,justice
+Healthcare Support Occupations,Equity & Inclusion,representation
+Healthcare Support Occupations,Equity & Inclusion,fairness
+Healthcare Support Occupations,Equity & Inclusion,belonging
+Healthcare Support Occupations,Equity & Inclusion,accessibility
+Healthcare Support Occupations,Equity & Inclusion,anti-bias
+Healthcare Support Occupations,Collaboration & Relational Work,teamwork
+Healthcare Support Occupations,Collaboration & Relational Work,collaboration
+Healthcare Support Occupations,Collaboration & Relational Work,relationship
+Healthcare Support Occupations,Collaboration & Relational Work,partnership
+Healthcare Support Occupations,Collaboration & Relational Work,network
+Healthcare Support Occupations,Collaboration & Relational Work,trust
+Healthcare Support Occupations,Collaboration & Relational Work,coordination
+Healthcare Support Occupations,Collaboration & Relational Work,shared goals
+Healthcare Support Occupations,Collaboration & Relational Work,communication
+Healthcare Support Occupations,Collaboration & Relational Work,support
+Healthcare Support Occupations,Adaptation & Flexibility,resilience
+Healthcare Support Occupations,Adaptation & Flexibility,agility
+Healthcare Support Occupations,Adaptation & Flexibility,change
+Healthcare Support Occupations,Adaptation & Flexibility,pivot
+Healthcare Support Occupations,Adaptation & Flexibility,adapt
+Healthcare Support Occupations,Adaptation & Flexibility,flexibility
+Healthcare Support Occupations,Adaptation & Flexibility,iteration
+Healthcare Support Occupations,Adaptation & Flexibility,response
+Healthcare Support Occupations,Adaptation & Flexibility,readiness
+Healthcare Support Occupations,Adaptation & Flexibility,navigation
+"Arts, Design, Entertainment, Sports, and Media Occupations",Communication Strategy,signal
+"Arts, Design, Entertainment, Sports, and Media Occupations",Communication Strategy,transmit
+"Arts, Design, Entertainment, Sports, and Media Occupations",Communication Strategy,encode
+"Arts, Design, Entertainment, Sports, and Media Occupations",Communication Strategy,resonance
+"Arts, Design, Entertainment, Sports, and Media Occupations",Communication Strategy,map
+"Arts, Design, Entertainment, Sports, and Media Occupations",Communication Strategy,message
+"Arts, Design, Entertainment, Sports, and Media Occupations",Communication Strategy,tone
+"Arts, Design, Entertainment, Sports, and Media Occupations",Communication Strategy,framing
+"Arts, Design, Entertainment, Sports, and Media Occupations",Communication Strategy,narrative
+"Arts, Design, Entertainment, Sports, and Media Occupations",Communication Strategy,audience
+"Arts, Design, Entertainment, Sports, and Media Occupations",Presence & Identity,presence
+"Arts, Design, Entertainment, Sports, and Media Occupations",Presence & Identity,voice
+"Arts, Design, Entertainment, Sports, and Media Occupations",Presence & Identity,visibility
+"Arts, Design, Entertainment, Sports, and Media Occupations",Presence & Identity,identity
+"Arts, Design, Entertainment, Sports, and Media Occupations",Presence & Identity,stance
+"Arts, Design, Entertainment, Sports, and Media Occupations",Presence & Identity,authenticity
+"Arts, Design, Entertainment, Sports, and Media Occupations",Presence & Identity,reputation
+"Arts, Design, Entertainment, Sports, and Media Occupations",Presence & Identity,persona
+"Arts, Design, Entertainment, Sports, and Media Occupations",Presence & Identity,recognition
+"Arts, Design, Entertainment, Sports, and Media Occupations",Presence & Identity,name
+"Arts, Design, Entertainment, Sports, and Media Occupations",Learning & Instruction,curriculum
+"Arts, Design, Entertainment, Sports, and Media Occupations",Learning & Instruction,teaching
+"Arts, Design, Entertainment, Sports, and Media Occupations",Learning & Instruction,instructional design
+"Arts, Design, Entertainment, Sports, and Media Occupations",Learning & Instruction,scaffold
+"Arts, Design, Entertainment, Sports, and Media Occupations",Learning & Instruction,assessment
+"Arts, Design, Entertainment, Sports, and Media Occupations",Learning & Instruction,learning outcomes
+"Arts, Design, Entertainment, Sports, and Media Occupations",Learning & Instruction,pedagogy
+"Arts, Design, Entertainment, Sports, and Media Occupations",Learning & Instruction,competency
+"Arts, Design, Entertainment, Sports, and Media Occupations",Learning & Instruction,formative
+"Arts, Design, Entertainment, Sports, and Media Occupations",Learning & Instruction,engagement
+Protective Service Occupations,Risk & Compliance,risk
+Protective Service Occupations,Risk & Compliance,compliance
+Protective Service Occupations,Risk & Compliance,regulation
+Protective Service Occupations,Risk & Compliance,audit
+Protective Service Occupations,Risk & Compliance,policy
+Protective Service Occupations,Risk & Compliance,safety
+Protective Service Occupations,Risk & Compliance,liability
+Protective Service Occupations,Risk & Compliance,control
+Protective Service Occupations,Risk & Compliance,protocol
+Protective Service Occupations,Risk & Compliance,ethics
+Protective Service Occupations,Leadership & Influence,leadership
+Protective Service Occupations,Leadership & Influence,coaching
+Protective Service Occupations,Leadership & Influence,influence
+Protective Service Occupations,Leadership & Influence,vision
+Protective Service Occupations,Leadership & Influence,strategy
+Protective Service Occupations,Leadership & Influence,mentorship
+Protective Service Occupations,Leadership & Influence,decision-making
+Protective Service Occupations,Leadership & Influence,initiative
+Protective Service Occupations,Leadership & Influence,credibility
+Protective Service Occupations,Leadership & Influence,alignment
+Protective Service Occupations,Adaptation & Flexibility,resilience
+Protective Service Occupations,Adaptation & Flexibility,agility
+Protective Service Occupations,Adaptation & Flexibility,change
+Protective Service Occupations,Adaptation & Flexibility,pivot
+Protective Service Occupations,Adaptation & Flexibility,adapt
+Protective Service Occupations,Adaptation & Flexibility,flexibility
+Protective Service Occupations,Adaptation & Flexibility,iteration
+Protective Service Occupations,Adaptation & Flexibility,response
+Protective Service Occupations,Adaptation & Flexibility,readiness
+Protective Service Occupations,Adaptation & Flexibility,navigation
+Food Preparation and Serving Related Occupations,Adaptation & Flexibility,resilience
+Food Preparation and Serving Related Occupations,Adaptation & Flexibility,agility
+Food Preparation and Serving Related Occupations,Adaptation & Flexibility,change
+Food Preparation and Serving Related Occupations,Adaptation & Flexibility,pivot
+Food Preparation and Serving Related Occupations,Adaptation & Flexibility,adapt
+Food Preparation and Serving Related Occupations,Adaptation & Flexibility,flexibility
+Food Preparation and Serving Related Occupations,Adaptation & Flexibility,iteration
+Food Preparation and Serving Related Occupations,Adaptation & Flexibility,response
+Food Preparation and Serving Related Occupations,Adaptation & Flexibility,readiness
+Food Preparation and Serving Related Occupations,Adaptation & Flexibility,navigation
+Food Preparation and Serving Related Occupations,Collaboration & Relational Work,teamwork
+Food Preparation and Serving Related Occupations,Collaboration & Relational Work,collaboration
+Food Preparation and Serving Related Occupations,Collaboration & Relational Work,relationship
+Food Preparation and Serving Related Occupations,Collaboration & Relational Work,partnership
+Food Preparation and Serving Related Occupations,Collaboration & Relational Work,network
+Food Preparation and Serving Related Occupations,Collaboration & Relational Work,trust
+Food Preparation and Serving Related Occupations,Collaboration & Relational Work,coordination
+Food Preparation and Serving Related Occupations,Collaboration & Relational Work,shared goals
+Food Preparation and Serving Related Occupations,Collaboration & Relational Work,communication
+Food Preparation and Serving Related Occupations,Collaboration & Relational Work,support
+Food Preparation and Serving Related Occupations,Outcomes & Impact,impact
+Food Preparation and Serving Related Occupations,Outcomes & Impact,result
+Food Preparation and Serving Related Occupations,Outcomes & Impact,deliverable
+Food Preparation and Serving Related Occupations,Outcomes & Impact,transformation
+Food Preparation and Serving Related Occupations,Outcomes & Impact,metric
+Food Preparation and Serving Related Occupations,Outcomes & Impact,value
+Food Preparation and Serving Related Occupations,Outcomes & Impact,evidence of change
+Food Preparation and Serving Related Occupations,Outcomes & Impact,ROI
+Food Preparation and Serving Related Occupations,Outcomes & Impact,growth
+Food Preparation and Serving Related Occupations,Outcomes & Impact,effectiveness
+Building and Grounds Cleaning and Maintenance Occupations,Systems & Structure,workflow
+Building and Grounds Cleaning and Maintenance Occupations,Systems & Structure,process
+Building and Grounds Cleaning and Maintenance Occupations,Systems & Structure,infrastructure
+Building and Grounds Cleaning and Maintenance Occupations,Systems & Structure,architecture
+Building and Grounds Cleaning and Maintenance Occupations,Systems & Structure,governance
+Building and Grounds Cleaning and Maintenance Occupations,Systems & Structure,standards
+Building and Grounds Cleaning and Maintenance Occupations,Systems & Structure,interoperability
+Building and Grounds Cleaning and Maintenance Occupations,Systems & Structure,system design
+Building and Grounds Cleaning and Maintenance Occupations,Systems & Structure,platform
+Building and Grounds Cleaning and Maintenance Occupations,Systems & Structure,protocol
+Building and Grounds Cleaning and Maintenance Occupations,Adaptation & Flexibility,resilience
+Building and Grounds Cleaning and Maintenance Occupations,Adaptation & Flexibility,agility
+Building and Grounds Cleaning and Maintenance Occupations,Adaptation & Flexibility,change
+Building and Grounds Cleaning and Maintenance Occupations,Adaptation & Flexibility,pivot
+Building and Grounds Cleaning and Maintenance Occupations,Adaptation & Flexibility,adapt
+Building and Grounds Cleaning and Maintenance Occupations,Adaptation & Flexibility,flexibility
+Building and Grounds Cleaning and Maintenance Occupations,Adaptation & Flexibility,iteration
+Building and Grounds Cleaning and Maintenance Occupations,Adaptation & Flexibility,response
+Building and Grounds Cleaning and Maintenance Occupations,Adaptation & Flexibility,readiness
+Building and Grounds Cleaning and Maintenance Occupations,Adaptation & Flexibility,navigation
+Personal Care and Service Occupations,Equity & Inclusion,equity
+Personal Care and Service Occupations,Equity & Inclusion,diversity
+Personal Care and Service Occupations,Equity & Inclusion,inclusion
+Personal Care and Service Occupations,Equity & Inclusion,access
+Personal Care and Service Occupations,Equity & Inclusion,justice
+Personal Care and Service Occupations,Equity & Inclusion,representation
+Personal Care and Service Occupations,Equity & Inclusion,fairness
+Personal Care and Service Occupations,Equity & Inclusion,belonging
+Personal Care and Service Occupations,Equity & Inclusion,accessibility
+Personal Care and Service Occupations,Equity & Inclusion,anti-bias
+Personal Care and Service Occupations,Presence & Identity,presence
+Personal Care and Service Occupations,Presence & Identity,voice
+Personal Care and Service Occupations,Presence & Identity,visibility
+Personal Care and Service Occupations,Presence & Identity,identity
+Personal Care and Service Occupations,Presence & Identity,stance
+Personal Care and Service Occupations,Presence & Identity,authenticity
+Personal Care and Service Occupations,Presence & Identity,reputation
+Personal Care and Service Occupations,Presence & Identity,persona
+Personal Care and Service Occupations,Presence & Identity,recognition
+Personal Care and Service Occupations,Presence & Identity,name
+Personal Care and Service Occupations,Collaboration & Relational Work,teamwork
+Personal Care and Service Occupations,Collaboration & Relational Work,collaboration
+Personal Care and Service Occupations,Collaboration & Relational Work,relationship
+Personal Care and Service Occupations,Collaboration & Relational Work,partnership
+Personal Care and Service Occupations,Collaboration & Relational Work,network
+Personal Care and Service Occupations,Collaboration & Relational Work,trust
+Personal Care and Service Occupations,Collaboration & Relational Work,coordination
+Personal Care and Service Occupations,Collaboration & Relational Work,shared goals
+Personal Care and Service Occupations,Collaboration & Relational Work,communication
+Personal Care and Service Occupations,Collaboration & Relational Work,support
+Sales and Related Occupations,Communication Strategy,signal
+Sales and Related Occupations,Communication Strategy,transmit
+Sales and Related Occupations,Communication Strategy,encode
+Sales and Related Occupations,Communication Strategy,resonance
+Sales and Related Occupations,Communication Strategy,map
+Sales and Related Occupations,Communication Strategy,message
+Sales and Related Occupations,Communication Strategy,tone
+Sales and Related Occupations,Communication Strategy,framing
+Sales and Related Occupations,Communication Strategy,narrative
+Sales and Related Occupations,Communication Strategy,audience
+Sales and Related Occupations,Outcomes & Impact,impact
+Sales and Related Occupations,Outcomes & Impact,result
+Sales and Related Occupations,Outcomes & Impact,deliverable
+Sales and Related Occupations,Outcomes & Impact,transformation
+Sales and Related Occupations,Outcomes & Impact,metric
+Sales and Related Occupations,Outcomes & Impact,value
+Sales and Related Occupations,Outcomes & Impact,evidence of change
+Sales and Related Occupations,Outcomes & Impact,ROI
+Sales and Related Occupations,Outcomes & Impact,growth
+Sales and Related Occupations,Outcomes & Impact,effectiveness
+Sales and Related Occupations,Presence & Identity,presence
+Sales and Related Occupations,Presence & Identity,voice
+Sales and Related Occupations,Presence & Identity,visibility
+Sales and Related Occupations,Presence & Identity,identity
+Sales and Related Occupations,Presence & Identity,stance
+Sales and Related Occupations,Presence & Identity,authenticity
+Sales and Related Occupations,Presence & Identity,reputation
+Sales and Related Occupations,Presence & Identity,persona
+Sales and Related Occupations,Presence & Identity,recognition
+Sales and Related Occupations,Presence & Identity,name
+Office and Administrative Support Occupations,Systems & Structure,workflow
+Office and Administrative Support Occupations,Systems & Structure,process
+Office and Administrative Support Occupations,Systems & Structure,infrastructure
+Office and Administrative Support Occupations,Systems & Structure,architecture
+Office and Administrative Support Occupations,Systems & Structure,governance
+Office and Administrative Support Occupations,Systems & Structure,standards
+Office and Administrative Support Occupations,Systems & Structure,interoperability
+Office and Administrative Support Occupations,Systems & Structure,system design
+Office and Administrative Support Occupations,Systems & Structure,platform
+Office and Administrative Support Occupations,Systems & Structure,protocol
+Office and Administrative Support Occupations,Communication Strategy,signal
+Office and Administrative Support Occupations,Communication Strategy,transmit
+Office and Administrative Support Occupations,Communication Strategy,encode
+Office and Administrative Support Occupations,Communication Strategy,resonance
+Office and Administrative Support Occupations,Communication Strategy,map
+Office and Administrative Support Occupations,Communication Strategy,message
+Office and Administrative Support Occupations,Communication Strategy,tone
+Office and Administrative Support Occupations,Communication Strategy,framing
+Office and Administrative Support Occupations,Communication Strategy,narrative
+Office and Administrative Support Occupations,Communication Strategy,audience
+Office and Administrative Support Occupations,Risk & Compliance,risk
+Office and Administrative Support Occupations,Risk & Compliance,compliance
+Office and Administrative Support Occupations,Risk & Compliance,regulation
+Office and Administrative Support Occupations,Risk & Compliance,audit
+Office and Administrative Support Occupations,Risk & Compliance,policy
+Office and Administrative Support Occupations,Risk & Compliance,safety
+Office and Administrative Support Occupations,Risk & Compliance,liability
+Office and Administrative Support Occupations,Risk & Compliance,control
+Office and Administrative Support Occupations,Risk & Compliance,protocol
+Office and Administrative Support Occupations,Risk & Compliance,ethics
+"Farming, Fishing, and Forestry Occupations",Adaptation & Flexibility,resilience
+"Farming, Fishing, and Forestry Occupations",Adaptation & Flexibility,agility
+"Farming, Fishing, and Forestry Occupations",Adaptation & Flexibility,change
+"Farming, Fishing, and Forestry Occupations",Adaptation & Flexibility,pivot
+"Farming, Fishing, and Forestry Occupations",Adaptation & Flexibility,adapt
+"Farming, Fishing, and Forestry Occupations",Adaptation & Flexibility,flexibility
+"Farming, Fishing, and Forestry Occupations",Adaptation & Flexibility,iteration
+"Farming, Fishing, and Forestry Occupations",Adaptation & Flexibility,response
+"Farming, Fishing, and Forestry Occupations",Adaptation & Flexibility,readiness
+"Farming, Fishing, and Forestry Occupations",Adaptation & Flexibility,navigation
+"Farming, Fishing, and Forestry Occupations",Systems & Structure,workflow
+"Farming, Fishing, and Forestry Occupations",Systems & Structure,process
+"Farming, Fishing, and Forestry Occupations",Systems & Structure,infrastructure
+"Farming, Fishing, and Forestry Occupations",Systems & Structure,architecture
+"Farming, Fishing, and Forestry Occupations",Systems & Structure,governance
+"Farming, Fishing, and Forestry Occupations",Systems & Structure,standards
+"Farming, Fishing, and Forestry Occupations",Systems & Structure,interoperability
+"Farming, Fishing, and Forestry Occupations",Systems & Structure,system design
+"Farming, Fishing, and Forestry Occupations",Systems & Structure,platform
+"Farming, Fishing, and Forestry Occupations",Systems & Structure,protocol
+Construction and Extraction Occupations,Systems & Structure,workflow
+Construction and Extraction Occupations,Systems & Structure,process
+Construction and Extraction Occupations,Systems & Structure,infrastructure
+Construction and Extraction Occupations,Systems & Structure,architecture
+Construction and Extraction Occupations,Systems & Structure,governance
+Construction and Extraction Occupations,Systems & Structure,standards
+Construction and Extraction Occupations,Systems & Structure,interoperability
+Construction and Extraction Occupations,Systems & Structure,system design
+Construction and Extraction Occupations,Systems & Structure,platform
+Construction and Extraction Occupations,Systems & Structure,protocol
+Construction and Extraction Occupations,Outcomes & Impact,impact
+Construction and Extraction Occupations,Outcomes & Impact,result
+Construction and Extraction Occupations,Outcomes & Impact,deliverable
+Construction and Extraction Occupations,Outcomes & Impact,transformation
+Construction and Extraction Occupations,Outcomes & Impact,metric
+Construction and Extraction Occupations,Outcomes & Impact,value
+Construction and Extraction Occupations,Outcomes & Impact,evidence of change
+Construction and Extraction Occupations,Outcomes & Impact,ROI
+Construction and Extraction Occupations,Outcomes & Impact,growth
+Construction and Extraction Occupations,Outcomes & Impact,effectiveness
+Construction and Extraction Occupations,Adaptation & Flexibility,resilience
+Construction and Extraction Occupations,Adaptation & Flexibility,agility
+Construction and Extraction Occupations,Adaptation & Flexibility,change
+Construction and Extraction Occupations,Adaptation & Flexibility,pivot
+Construction and Extraction Occupations,Adaptation & Flexibility,adapt
+Construction and Extraction Occupations,Adaptation & Flexibility,flexibility
+Construction and Extraction Occupations,Adaptation & Flexibility,iteration
+Construction and Extraction Occupations,Adaptation & Flexibility,response
+Construction and Extraction Occupations,Adaptation & Flexibility,readiness
+Construction and Extraction Occupations,Adaptation & Flexibility,navigation
+"Installation, Maintenance, and Repair Occupations",AI & Technical Literacy,AI
+"Installation, Maintenance, and Repair Occupations",AI & Technical Literacy,machine learning
+"Installation, Maintenance, and Repair Occupations",AI & Technical Literacy,automation
+"Installation, Maintenance, and Repair Occupations",AI & Technical Literacy,digital fluency
+"Installation, Maintenance, and Repair Occupations",AI & Technical Literacy,tools
+"Installation, Maintenance, and Repair Occupations",AI & Technical Literacy,algorithms
+"Installation, Maintenance, and Repair Occupations",AI & Technical Literacy,prompting
+"Installation, Maintenance, and Repair Occupations",AI & Technical Literacy,data modeling
+"Installation, Maintenance, and Repair Occupations",AI & Technical Literacy,tech stack
+"Installation, Maintenance, and Repair Occupations",AI & Technical Literacy,interface
+"Installation, Maintenance, and Repair Occupations",Systems & Structure,workflow
+"Installation, Maintenance, and Repair Occupations",Systems & Structure,process
+"Installation, Maintenance, and Repair Occupations",Systems & Structure,infrastructure
+"Installation, Maintenance, and Repair Occupations",Systems & Structure,architecture
+"Installation, Maintenance, and Repair Occupations",Systems & Structure,governance
+"Installation, Maintenance, and Repair Occupations",Systems & Structure,standards
+"Installation, Maintenance, and Repair Occupations",Systems & Structure,interoperability
+"Installation, Maintenance, and Repair Occupations",Systems & Structure,system design
+"Installation, Maintenance, and Repair Occupations",Systems & Structure,platform
+"Installation, Maintenance, and Repair Occupations",Systems & Structure,protocol
+"Installation, Maintenance, and Repair Occupations",Outcomes & Impact,impact
+"Installation, Maintenance, and Repair Occupations",Outcomes & Impact,result
+"Installation, Maintenance, and Repair Occupations",Outcomes & Impact,deliverable
+"Installation, Maintenance, and Repair Occupations",Outcomes & Impact,transformation
+"Installation, Maintenance, and Repair Occupations",Outcomes & Impact,metric
+"Installation, Maintenance, and Repair Occupations",Outcomes & Impact,value
+"Installation, Maintenance, and Repair Occupations",Outcomes & Impact,evidence of change
+"Installation, Maintenance, and Repair Occupations",Outcomes & Impact,ROI
+"Installation, Maintenance, and Repair Occupations",Outcomes & Impact,growth
+"Installation, Maintenance, and Repair Occupations",Outcomes & Impact,effectiveness
+Production Occupations,Outcomes & Impact,impact
+Production Occupations,Outcomes & Impact,result
+Production Occupations,Outcomes & Impact,deliverable
+Production Occupations,Outcomes & Impact,transformation
+Production Occupations,Outcomes & Impact,metric
+Production Occupations,Outcomes & Impact,value
+Production Occupations,Outcomes & Impact,evidence of change
+Production Occupations,Outcomes & Impact,ROI
+Production Occupations,Outcomes & Impact,growth
+Production Occupations,Outcomes & Impact,effectiveness
+Production Occupations,Systems & Structure,workflow
+Production Occupations,Systems & Structure,process
+Production Occupations,Systems & Structure,infrastructure
+Production Occupations,Systems & Structure,architecture
+Production Occupations,Systems & Structure,governance
+Production Occupations,Systems & Structure,standards
+Production Occupations,Systems & Structure,interoperability
+Production Occupations,Systems & Structure,system design
+Production Occupations,Systems & Structure,platform
+Production Occupations,Systems & Structure,protocol
+Transportation and Material Moving Occupations,Adaptation & Flexibility,resilience
+Transportation and Material Moving Occupations,Adaptation & Flexibility,agility
+Transportation and Material Moving Occupations,Adaptation & Flexibility,change
+Transportation and Material Moving Occupations,Adaptation & Flexibility,pivot
+Transportation and Material Moving Occupations,Adaptation & Flexibility,adapt
+Transportation and Material Moving Occupations,Adaptation & Flexibility,flexibility
+Transportation and Material Moving Occupations,Adaptation & Flexibility,iteration
+Transportation and Material Moving Occupations,Adaptation & Flexibility,response
+Transportation and Material Moving Occupations,Adaptation & Flexibility,readiness
+Transportation and Material Moving Occupations,Adaptation & Flexibility,navigation
+Transportation and Material Moving Occupations,Systems & Structure,workflow
+Transportation and Material Moving Occupations,Systems & Structure,process
+Transportation and Material Moving Occupations,Systems & Structure,infrastructure
+Transportation and Material Moving Occupations,Systems & Structure,architecture
+Transportation and Material Moving Occupations,Systems & Structure,governance
+Transportation and Material Moving Occupations,Systems & Structure,standards
+Transportation and Material Moving Occupations,Systems & Structure,interoperability
+Transportation and Material Moving Occupations,Systems & Structure,system design
+Transportation and Material Moving Occupations,Systems & Structure,platform
+Transportation and Material Moving Occupations,Systems & Structure,protocol
+Community and Social Service Occupations,Equity & Inclusion,equity
+Community and Social Service Occupations,Equity & Inclusion,diversity
+Community and Social Service Occupations,Equity & Inclusion,inclusion
+Community and Social Service Occupations,Equity & Inclusion,access
+Community and Social Service Occupations,Equity & Inclusion,justice
+Community and Social Service Occupations,Equity & Inclusion,representation
+Community and Social Service Occupations,Equity & Inclusion,fairness
+Community and Social Service Occupations,Equity & Inclusion,belonging
+Community and Social Service Occupations,Equity & Inclusion,accessibility
+Community and Social Service Occupations,Equity & Inclusion,anti-bias
+Community and Social Service Occupations,Presence & Identity,presence
+Community and Social Service Occupations,Presence & Identity,voice
+Community and Social Service Occupations,Presence & Identity,visibility
+Community and Social Service Occupations,Presence & Identity,identity
+Community and Social Service Occupations,Presence & Identity,stance
+Community and Social Service Occupations,Presence & Identity,authenticity
+Community and Social Service Occupations,Presence & Identity,reputation
+Community and Social Service Occupations,Presence & Identity,persona
+Community and Social Service Occupations,Presence & Identity,recognition
+Community and Social Service Occupations,Presence & Identity,name
+Community and Social Service Occupations,Collaboration & Relational Work,teamwork
+Community and Social Service Occupations,Collaboration & Relational Work,collaboration
+Community and Social Service Occupations,Collaboration & Relational Work,relationship
+Community and Social Service Occupations,Collaboration & Relational Work,partnership
+Community and Social Service Occupations,Collaboration & Relational Work,network
+Community and Social Service Occupations,Collaboration & Relational Work,trust
+Community and Social Service Occupations,Collaboration & Relational Work,coordination
+Community and Social Service Occupations,Collaboration & Relational Work,shared goals
+Community and Social Service Occupations,Collaboration & Relational Work,communication
+Community and Social Service Occupations,Collaboration & Relational Work,support
+Military Specific Occupations,Leadership & Influence,leadership
+Military Specific Occupations,Leadership & Influence,coaching
+Military Specific Occupations,Leadership & Influence,influence
+Military Specific Occupations,Leadership & Influence,vision
+Military Specific Occupations,Leadership & Influence,strategy
+Military Specific Occupations,Leadership & Influence,mentorship
+Military Specific Occupations,Leadership & Influence,decision-making
+Military Specific Occupations,Leadership & Influence,initiative
+Military Specific Occupations,Leadership & Influence,credibility
+Military Specific Occupations,Leadership & Influence,alignment
+Military Specific Occupations,Risk & Compliance,risk
+Military Specific Occupations,Risk & Compliance,compliance
+Military Specific Occupations,Risk & Compliance,regulation
+Military Specific Occupations,Risk & Compliance,audit
+Military Specific Occupations,Risk & Compliance,policy
+Military Specific Occupations,Risk & Compliance,safety
+Military Specific Occupations,Risk & Compliance,liability
+Military Specific Occupations,Risk & Compliance,control
+Military Specific Occupations,Risk & Compliance,protocol
+Military Specific Occupations,Risk & Compliance,ethics
+Military Specific Occupations,Adaptation & Flexibility,resilience
+Military Specific Occupations,Adaptation & Flexibility,agility
+Military Specific Occupations,Adaptation & Flexibility,change
+Military Specific Occupations,Adaptation & Flexibility,pivot
+Military Specific Occupations,Adaptation & Flexibility,adapt
+Military Specific Occupations,Adaptation & Flexibility,flexibility
+Military Specific Occupations,Adaptation & Flexibility,iteration
+Military Specific Occupations,Adaptation & Flexibility,response
+Military Specific Occupations,Adaptation & Flexibility,readiness
+Military Specific Occupations,Adaptation & Flexibility,navigation

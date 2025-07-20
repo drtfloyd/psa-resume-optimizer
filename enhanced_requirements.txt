@@ -1,0 +1,33 @@
+# PSA Resume Optimizer Enhanced Requirements
+# Core dependencies (required)
+streamlit>=1.25.0
+pandas>=1.5.0
+numpy>=1.23.0
+PyPDF2>=3.0.0
+plotly>=5.15.0
+
+# Enhanced file processing
+python-docx>=0.8.11
+fpdf2>=2.7.0,<3.0.0
+
+# Enhanced visualizations  
+plotly>=5.15.0
+seaborn>=0.12.0
+
+# AI Integration (optional - install as needed)
+# openai>=1.3.0
+# anthropic>=0.7.0
+
+# Advanced features (optional)
+# pytesseract>=0.3.10
+# opencv-python>=4.8.0
+# requests>=2.31.0
+# beautifulsoup4>=4.12.0
+
+# Enterprise features (optional)
+# sqlalchemy>=2.0.0
+# redis>=5.0.0
+
+# Streamlit extensions (optional)
+# streamlit-aggrid>=0.3.4
+# streamlit-ace>=0.1.1
